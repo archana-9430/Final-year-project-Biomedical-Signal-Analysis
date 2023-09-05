@@ -1,0 +1,220 @@
+                                       
+% This template was created for future students affiliated with the Department of Economics at the University of Bergamo by:
+% - Manuel Donà (Energy Market Modeler at Falck Renewables SpA);
+% - Andrea Lopes (PhD Candidate in Economics at University of Milan);
+% - Andrea Zoccatelli (Data Scientist at GroupM).
+
+
+
+
+\documentclass{beamer}
+%\hypersetup{pdfpagemode=FullScreen} %full screen mode
+\setbeamertemplate{navigation symbols}{}
+
+
+\usepackage[english]{babel} 
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath,amssymb}
+\usepackage[T1]{fontenc} 
+\usepackage{curves}
+\usepackage{verbatim}
+\usepackage{multimedia}
+\usepackage{mathptmx}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{algorithm,algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\usepackage{lipsum}
+\setbeamertemplate{caption}[numbered] % For numbering figures
+
+\mode<presentation> {
+
+\usetheme{Madrid} 
+
+\usecolortheme{whale} 
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+
+
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx}
+\usepackage{booktabs} 
+\setbeamercovered{transparent}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{theorems}[numbered]
+\setbeamerfont{title}{size=\Large}%\miniscule,command,tiny, scriptsize,footnotesize,small,normalsize,large,Large,LARGE,huge,Huge,HUGE
+\setbeamerfont{date}{size=\tiny}%{\fontsize{40}{48} \selectfont Text}
+
+\setbeamertemplate{itemize items}[ball] % if you want a ball
+\setbeamertemplate{itemize subitem}[circle] % if you want a circle
+\setbeamertemplate{itemize subsubitem}[triangle] % if you want a triangle
+
+%-------customized frame-------
+\newcounter{cont}
+
+\makeatletter
+%allowframebreaks numbering in the title
+\setbeamertemplate{frametitle continuation}{%
+   % \setcounter{cont}{\beamer@endpageofframe}%
+    %\addtocounter{cont}{1}%
+   % \addtocounter{cont}{-\beamer@startpageofframe}%
+   % (\insertcontinuationcount/\arabic{cont})%
+}
+\makeatother
+
+%--------------------------
+%	TITLE PAGE
+%--------------------------
+
+\title[Biomedical Signal Analysis]{ML/DL based biomedical signal analysis and processing for disease identification and related hardware implementation } % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author[Archana Kumai \& Shwashwast Das]{Archana Kumai \& Shwashwast Das}
+
+\institute[STUDENT ID] %matricola
+{
+
+{\small Supervisor} \\
+\medskip
+{\small Prof. Sumitra Mukhopadhyay }\\
+%\begin{center}
+%\includegraphics[width=0.1\textwidth]{uoh.png}
+%\end{center}
+\vspace{0.5cm}
+%\medskip
+Institute of Radiophysics and Electronics\\
+University of Calcutta
+
+%\medskip
+%\textit{john@smith.com} % Your email address
+}
+\date[\today]{\today}
+%This will place the image at position "30 right/left and 120 up/down" relative to the top left corner of the current page.
+%\titlegraphic{%
+  %\begin{picture}(0,0)
+   % \put(37,146){\makebox(0,0)[rt]{\includegraphics[width=2.5cm]{bg.png}}}
+ % \end{picture}} % you can modify the UNIBG logo to center it.
+% \date{insert date} % Date
+ 
+\begin{document}
+\definecolor{your_color}{HTML}{172642}
+\setbeamercolor{structure}{fg=your_color}
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\setbeamertemplate{footline}[page number]
+
+\end{frame}
+\setbeamertemplate{footline}[page number]
+
+
+%-------------------------------
+%	PRESENTATION SLIDES
+%-------------------------------
+
+\section{Name\_1} 
+\begin{frame}[allowframebreaks]
+\frametitle{Agenda}
+\begin{itemize}
+\item {Introduction}
+\vspace{0.15cm}
+\item {Progress}
+\vspace{0.15cm}
+\item {Learnings}
+\vspace{0.15cm}
+\item {Future Updates}
+\vspace{0.15cm}
+\item {References}
+\end{itemize}
+
+\end{frame}
+
+
+%---------------------------------------
+
+%---------------------------------------------------------------
+\section{Name\_2}
+\begin{frame}[allowframebreaks]
+\frametitle{Introduction}
+\textbf{Bullets title}
+\vspace{0.3cm}
+\begin{itemize}
+\item 
+\vspace{0.15cm}
+\item 
+\end{itemize}
+
+\end{frame}
+
+%----------------------------------------
+
+\section{Name\_3}
+\begin{frame}[allowframebreak]
+\frametitle{Progress}\small
+
+%\begin{block}{insert block name (e.g. proposition or key assumption)}
+ %   write your proposition here
+%\end{block} % insert in the block fundamental assumptions, propositions, lemmas and so on, with the CORRECT block title (e.g., Proposition 1).
+\end{frame}
+
+%---------------------------------------
+\section{Name\_4}
+\begingroup
+{
+\setbeamercolor{background canvas}{bg=your_color}
+\setbeamertemplate{footline}{}
+\begin{frame}[c]
+\vfill
+\begin{center}
+\Large\textcolor{white}{Key question}
+\end{center}
+\vfill
+\end{frame}
+}
+\endgroup
+
+
+\section{References}
+\begin{frame}[allowframebreaks]
+\frametitle{References}\scriptsize
+
+insert your references here
+
+
+\end{frame}
+
+%-------------------------------
+\begin{frame}
+\Huge{\centerline{Thank You}}
+\end{frame}
+
+%-------------------------------
+\begingroup
+{
+\setbeamercolor{background canvas}{bg=your_color}
+\setbeamertemplate{footline}{}
+\begin{frame}[c]
+\vfill
+\begin{center}
+\Large\textcolor{white}{Thank you}
+\end{center}
+\vfill
+\end{frame}
+} 
+
+\endgroup
+
+% Choose your favorite thank you slide
+
+%-------------------------------
+\section{Appendix}
+\begin{frame}{Appendix}
+    insert here an appendix if needed
+\end{frame}
+
+
+\end{document}
