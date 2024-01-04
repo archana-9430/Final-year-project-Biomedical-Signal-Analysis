@@ -1,4 +1,5 @@
 annotated_file = "Annotated_125Hz\\bidmc03m.csv"
+features_file = "features_125Hz\\bidmc03m.csv"
 
 import pandas as pd
 import math
@@ -33,16 +34,21 @@ def extract_features(segment):
     
     return features
 
-df = pd.read_csv(annotated_file, skiprows=2, header=None) 
-#debugging
-for col in df.columns:
-    unique_values = df[col].value_counts()
-    print(f"Column {col}: \n{unique_values}\n")
+def store_features(features_file, annotated_file):
+    df = pd.read_csv(annotated_file, skiprows=2, header=None) 
+    extracted_features = {col: extract_features(df[col]) for col in df}
+    features_df = pd.DataFrame(extracted_features)
+    features_df = features_df.T
+    features_df.to_csv(features_file)
     
-# Extract features from each segment (each column in the DataFrame)
-extracted_features = {col: extract_features(df[col]) for col in df}
+    print(features_df)
+    
+store_features(features_file, annotated_file)
 
-features_df = pd.DataFrame(extracted_features)
-print(features_df.T)
+#debugging
+# for col in df.columns:
+#     unique_values = df[col].value_counts()
+#     print(f"Column {col}: \n{unique_values}\n")
+
 
 
