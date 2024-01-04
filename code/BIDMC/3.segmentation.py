@@ -62,13 +62,22 @@ def annotator( Time_stamp:list, Signal:list):
     Annotation_df = pd.DataFrame() # Create an empty dataframe to contain annotated data
 
     for i in range(0 , int_num_segment):
+        # take out the segment from the total signal
         current_segment = Signal[i * samples_per_window : (i+1) * samples_per_window]
         time = Time_stamp[i * samples_per_window : (i+1) * samples_per_window]
+
+        # plot the signal
         plot_signal(time , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
+
+        # ask for annotation
         annot = int(input("Segment-{} annot = ".format(i)))
+
+        #save the annotation 
         current_segment.insert(0,annot)
         Annotation_df["Segment {}".format(i)] = current_segment
-        Annotation_df.to_csv(path_or_buf = annotated_csv_path , index = False)
+        
+        # save on each segment
+        Annotation_df.to_csv(path_or_buf = annotated_csv_path , index = False) #save on each segment
 
     if(sum_segments%1):
         i += 1
@@ -85,13 +94,9 @@ def annotator( Time_stamp:list, Signal:list):
             current_segment += zero_padd
             Annotation_df["Segment {}".format(i)] = current_segment
 
-    return Annotation_df
+    Annotation_df.to_csv(path_or_buf = annotated_csv_path , index = False) #save the file
+    
 
 time_stamp_original_signal , original_signal = read_plot_original_signal(filtered_csv_path)
-
-time_stamp , signal = discard_samples(time_stamp_original_signal , original_signal)
-
-annot_df = annotator(time_stamp , signal)
-
-# save the Annotated data on csv file
-annot_df.to_csv(path_or_buf = annotated_csv_path , index = False)
+time_stamp , signal = discard_samples(time_stamp_original_signal , original_signal , sampling_freq)
+annotator(time_stamp , signal , sampling_freq)
