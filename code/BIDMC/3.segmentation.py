@@ -54,7 +54,7 @@ def annotator(Signal, Sampling_freq, Samples_per_window, Num_segments, Discard_o
 
 
 transpose_needed = input("~~~~\nData is row wise ? (y/n) ")
-if(transpose_needed == 'y'): transpose(csv_path)
+if(transpose_needed == 'y'): transpose(filtered_csv_path)
 
 ppg_df = pd.read_csv(filtered_csv_path)
 
