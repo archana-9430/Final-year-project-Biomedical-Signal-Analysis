@@ -6,15 +6,9 @@ import math
 import numpy as np
 from scipy.stats import entropy, skew, kurtosis
 
-# def shanon_entropy(segment) -> int: 
-#     entr = 0
-#     for i in range(0, len(segment)):
-#         entr += segment[i]*math.log(segment[i], 2)
-#     return entr
-
-def shannon_entropy(time_series):
+def shannon_entropy(segment):
     # Calculate the probability distribution
-    p = np.histogram(time_series)[0]
+    p = np.histogram(segment)[0]
     p_normalized = p / float(np.sum(p))
     p_normalized = p_normalized[np.nonzero(p_normalized)]
     
