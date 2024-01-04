@@ -39,6 +39,5 @@ def butterworth_bp_filter(data_file, order, fs, lowcut, highcut):
     plt.grid(True)
     plt.show()
     
-    
 butterworth_bp_filter(csv_data, 4, 125, 0.2, 4)
 
