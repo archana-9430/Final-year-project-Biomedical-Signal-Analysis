@@ -5,8 +5,14 @@ annotated_csv_path = "Annotated_125Hz\\bidmc03m.csv"
 sampling_freq = 125 
 window_len_sec = 10
 
+# global discard variables
 discard_ask = False
+global_discard = False # set it to True if you want discard, matters if discard_ask is False
+
+# transpose settings
 transpose_required = False
+
+# class list
 class_list = ["1" , "2"] # good segn = 1 , corrupted signal = 2
 
 import pandas as pd
@@ -43,14 +49,17 @@ def discard_samples(Time_Original_Signal: list , Original_Signal:list , Ask = Fa
     
     if(Ask == True):
         should_discard = input("\n Need to discard first and last 0.5 sec?(Y/N , Default: N) ") # discards if this variable is set to True
-        if(should_discard == ('y' or 'Y')):
-            discard_interval = 0.5
-            sample_discard = int(discard_interval * sampling_freq)
-            signal = Original_Signal[sample_discard:]
-            time_stamp = Time_Original_Signal[sample_discard:]
-            signal_len = len(signal)
-            signal = signal[:signal_len - sample_discard]
-            time_stamp = Time_Original_Signal[:signal_len - sample_discard]
+    else:
+        should_discard = 'N'
+
+    if((should_discard == ('y' or 'Y')) or (global_discard == True)):
+        discard_interval = 0.5
+        sample_discard = int(discard_interval * sampling_freq)
+        signal = Original_Signal[sample_discard:]
+        time_stamp = Time_Original_Signal[sample_discard:]
+        signal_len = len(signal)
+        signal = signal[:signal_len - sample_discard]
+        time_stamp = Time_Original_Signal[:signal_len - sample_discard]
     else:
         signal = Original_Signal
         time_stamp = Time_Original_Signal
@@ -104,13 +113,16 @@ def annotator(Filtered_Csv_Path , Annotated_Csv_Path):
 
     if(sum_segments%1):
         i += 1
+        # calculate the remaining sample number
         remaining_sample_num = len(signal) - i * samples_per_window
+
+        # take out the segment from the total signal and plot it
         current_segment = signal[i * samples_per_window : i * samples_per_window + remaining_sample_num]
         time = time_stamp[i * samples_per_window : i * samples_per_window + remaining_sample_num]
         plot_signal(time , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
 
-        discard_seg = input("\nDiscard it(y/n)? ")
-        if(discard_seg == 'n'):
+        discard_seg = input("\nDiscard it(y/n , Default: nq)? ")
+        if(discard_seg != 'y'):
             annot = take_annotation(i)
             current_segment.insert(0,annot)
             zero_padd = [ 0 for i in range(0 , samples_per_window - remaining_sample_num)]
