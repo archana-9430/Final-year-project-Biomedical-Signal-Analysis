@@ -1,5 +1,9 @@
 filtered_csv_path = "filtered_125Hz\\bidmc03m.csv"
 annotated_csv_path = "Annotated_125Hz\\bidmc03m.csv"
+#~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
+# save annotations settings ;;; for testing the running code protects from accidental overwrite
+# of the csv file
+save_anno = False
 
 # sampling freq in HERTZ
 sampling_freq = 125 
@@ -14,7 +18,7 @@ transpose_required = False
 
 # class list
 class_list = ["1" , "2"] # good segn = 1 , corrupted signal = 2
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -40,9 +44,9 @@ def pre_segmentation(filtered_file_path):
     plot_signal(time_stamp_original_signal , original_signal, "Time(s)", "PPG Signal" , "Original Signal")
 
     # discard samples if required
-    time_stamp , signal = discard_samples(time_stamp_original_signal , original_signal , discard_ask)
+    time_stamp_trimmed , signal_trimmed = discard_samples(time_stamp_original_signal , original_signal , discard_ask)
 
-    return time_stamp_original_signal , original_signal
+    return time_stamp_trimmed , signal_trimmed
 
 def discard_samples(time_stamp_original: list , original_signal:list , ask = False):
     
@@ -108,7 +112,8 @@ def annotator(filtered_file_path , annotated_file_path):
         annotation_df["Segment {}".format(i)] = current_segment
         
         # save on each segment
-        annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save on each segment
+        if(save_anno == True):
+            annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save on each segment
 
     if(num_segments%1):
         i += 1
@@ -128,6 +133,7 @@ def annotator(filtered_file_path , annotated_file_path):
             current_segment += zero_padd
             annotation_df["Segment {}".format(i)] = current_segment
 
-    annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
+    if(save_anno == True):
+        annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
 
 annotator(filtered_csv_path , annotated_csv_path)
