@@ -18,11 +18,6 @@ class_list = ["1" , "2"] # good segn = 1 , corrupted signal = 2
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def transpose(csv_file):
-    df = pd.read_csv(csv_file)
-    transposed = df.T
-    return transposed
-
 def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = None):
     plt.grid()
     plt.plot(x,y)
@@ -32,9 +27,13 @@ def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = N
     plt.show()
     plt.close()
 
-def pre_segmentation(Filtered_Csv_Path):
-    ppg_df = pd.read_csv(filtered_csv_path)
+def pre_segmentation(filtered_file_path):
+    ppg_df = pd.read_csv(filtered_file_path)
     
+    # transpose if asked to do so
+    if(transpose_required == True):
+        ppg_df = ppg_df.T
+
     # Plotting the signal obtained from file
     original_signal = ( ppg_df.iloc[ : , 0] ).tolist()
     time_stamp_original_signal = [ t/sampling_freq for t in range(0 , len(original_signal)) ]
@@ -45,9 +44,9 @@ def pre_segmentation(Filtered_Csv_Path):
 
     return time_stamp_original_signal , original_signal
 
-def discard_samples(Time_Original_Signal: list , Original_Signal:list , Ask = False):
+def discard_samples(time_stamp_original: list , original_signal:list , ask = False):
     
-    if(Ask == True):
+    if(ask == True):
         should_discard = input("\n Need to discard first and last 0.5 sec?(Y/N , Default: N) ") # discards if this variable is set to True
     else:
         should_discard = 'N'
@@ -55,28 +54,28 @@ def discard_samples(Time_Original_Signal: list , Original_Signal:list , Ask = Fa
     if((should_discard == ('y' or 'Y')) or (global_discard == True)):
         discard_interval = 0.5
         sample_discard = int(discard_interval * sampling_freq)
-        signal = Original_Signal[sample_discard:]
-        time_stamp = Time_Original_Signal[sample_discard:]
+        signal = original_signal[sample_discard:]
+        time_stamp = time_stamp_original[sample_discard:]
         signal_len = len(signal)
         signal = signal[:signal_len - sample_discard]
-        time_stamp = Time_Original_Signal[:signal_len - sample_discard]
+        time_stamp = time_stamp[:signal_len - sample_discard]
     else:
-        signal = Original_Signal
-        time_stamp = Time_Original_Signal
+        signal = original_signal
+        time_stamp = time_stamp_original
 
     return time_stamp , signal
 
-def take_annotation(Segment_Num:int):# safe annotation accept
+def take_annotation(segment_num:int):# safe annotation accept
     while True:
-        temp = input("Segment-{} annot = ".format(Segment_Num))
+        temp = input("Segment-{} annot = ".format(segment_num))
         if temp in class_list:
             return int(temp)
         else:
             print("\n!!Enter a valid number please!!\n")
 
-def annotator(Filtered_Csv_Path , Annotated_Csv_Path):
+def annotator(filtered_file_path , annotated_file_path):
     # extract time stamp , original signal from the csv file and pre-process e.g. discard 
-    time_stamp , signal = pre_segmentation(Filtered_Csv_Path)
+    time_stamp , signal = pre_segmentation(filtered_file_path)
 
     # Ask the window length 
     # window_len_sec = float(input("Window length in sec? "))
@@ -109,9 +108,9 @@ def annotator(Filtered_Csv_Path , Annotated_Csv_Path):
         annotation_df["Segment {}".format(i)] = current_segment
         
         # save on each segment
-        annotation_df.to_csv(path_or_buf = Annotated_Csv_Path , index = False) #save on each segment
+        annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save on each segment
 
-    if(sum_segments%1):
+    if(num_segments%1):
         i += 1
         # calculate the remaining sample number
         remaining_sample_num = len(signal) - i * samples_per_window
@@ -121,7 +120,7 @@ def annotator(Filtered_Csv_Path , Annotated_Csv_Path):
         time = time_stamp[i * samples_per_window : i * samples_per_window + remaining_sample_num]
         plot_signal(time , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
 
-        discard_seg = input("\nDiscard it(y/n , Default: nq)? ")
+        discard_seg = input("\nDiscard it(y/n , Default: n)? ")
         if(discard_seg != 'y'):
             annot = take_annotation(i)
             current_segment.insert(0,annot)
@@ -129,6 +128,6 @@ def annotator(Filtered_Csv_Path , Annotated_Csv_Path):
             current_segment += zero_padd
             annotation_df["Segment {}".format(i)] = current_segment
 
-    annotation_df.to_csv(path_or_buf = Annotated_Csv_Path , index = False) #save the file
+    annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
 
 annotator(filtered_csv_path , annotated_csv_path)
