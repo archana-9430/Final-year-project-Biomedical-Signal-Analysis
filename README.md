@@ -4,7 +4,7 @@
 ML/DL based PPG signal analysis and processing for disease identification and related hardware implementation.
 
 ## Current work:
-#### 1. Started working on a 125Hz PPG signal dataset with 8min long
+#### 1. Started working on a 125Hz PPG signal dataset with 8min long segments.
 #### 2. The flow of work is: 
     a) Text to csv (make it columnwise, ie., having a single row) 
     b) Perform filering (using 4th order butterworth bandpass filter(0.2-5Hz)) 
