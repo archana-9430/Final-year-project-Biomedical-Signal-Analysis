@@ -126,7 +126,7 @@ def annotator(filtered_file_path , annotated_file_path):
         plot_signal(time , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
 
         discard_seg = input("\nDiscard it(y/n , Default: n)? ")
-        if(discard_seg != 'y'):
+        if(discard_seg == 'y'):
             annot = take_annotation(i)
             current_segment.insert(0,annot)
             zero_padd = [ 0 for i in range(0 , samples_per_window - remaining_sample_num)]
