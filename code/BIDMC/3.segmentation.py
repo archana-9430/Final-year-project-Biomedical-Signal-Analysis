@@ -3,7 +3,7 @@ annotated_csv_path = "Annotated_125Hz\\bidmc03m.csv"
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 # save annotations settings ;;; for testing the running code protects from accidental overwrite
 # of the csv file
-save_anno = False
+save_anno = True
 
 # sampling freq in HERTZ
 sampling_freq = 125 
