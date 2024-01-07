@@ -1,4 +1,5 @@
-csv_data = "CSV_Data_125Hz\\bidmc03m.csv"
+csv_data = "code\BIDMC\CSV_Data_125Hz\\bidmc03m.csv"
+filtered_data_file = "code\BIDMC\\filtered_125Hz\\bidmc03m.csv"
 
 import pandas as pd
 import numpy as np
@@ -26,7 +27,7 @@ def butterworth_bp_filter(data_file, order, fs, lowcut, highcut):
     filtered_df = pd.DataFrame({'Filtered_Signal': filtered_data})
 
     # Save the filtered data to a new CSV file
-    filtered_df.to_csv("filtered_125Hz\\bidmc03m.csv", index=False, header=False)
+    filtered_df.to_csv(filtered_data_file , index=False, header=False)
 
     # Plot original and filtered data
     plt.figure()
