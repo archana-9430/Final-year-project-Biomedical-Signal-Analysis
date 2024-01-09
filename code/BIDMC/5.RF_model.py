@@ -1,5 +1,5 @@
-annotated_csv_path = "Annotated_125Hz\\bidmc03m.csv"
-features_file_path = "features_125Hz\\bidmc03m.csv"
+annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
+features_file_path = "code\BIDMC\\features_125Hz\\bidmc03m.csv"
 
 rand_state = 54
 test_fraction = 0.5
@@ -7,7 +7,7 @@ num_trees = 5
 split_criteria = "gini"
 
 # k of k flod cross validation
-k = 10 # change if you want to experiment
+k = 4 # change if you want to experiment
 
 # class list
 class_list = ["1" , "2"] # good segn = 1 , corrupted signal = 2
@@ -69,12 +69,14 @@ def test_n_results(x_test_data , y_test_data , classifier):
     print("\nAvg score on test dataset = {}".format(classifier.score(x_test_data , y_test_data)))
     print("\nNumber of Estimators = {}".format(num_trees))
     print("Split Criteria = {}".format(split_criteria))
+    print(classifier)
 
 def RF_model(annotated_file , features_file):
     # get the dataset from the files
     features = pd.read_csv(features_file)
     annotated_data = pd.read_csv(annotated_file)
     labels = annotated_data.iloc[0] # this will exract the annotation 2nd row
+    
 
     # split the dataset using test_train_split() function
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
