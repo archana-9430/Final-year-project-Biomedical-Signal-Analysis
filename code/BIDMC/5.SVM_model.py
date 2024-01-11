@@ -1,5 +1,5 @@
-annotated_csv_path = "Annotated_125Hz\\bidmc04m.csv"
-features_file_path = "features_125Hz\\bidmc04m.csv"
+annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
+features_file_path = "code\BIDMC\\features_125Hz\\bidmc03m.csv"
 
 rand_state = 42
 test_fraction = 0.5
