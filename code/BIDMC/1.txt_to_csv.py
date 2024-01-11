@@ -1,7 +1,9 @@
-textfile_path = "Data_125Hz\\bidmc03m.txt" 
-csv_path = "CSV_Data_125Hz\\bidmc03m.csv"
+textfile_dir = "Data_125Hz\\" 
+csv_path = "CSV_Data_125Hz\\"
+path = "Data_125Hz"
 
 import pandas as pd
+import os
 
 def convert_file(textfile_path):
     with open(textfile_path, 'r') as input_file:
@@ -24,6 +26,11 @@ def get_rows_columns(csv_file):
     num_columns = len(df.columns)
     return num_rows, num_columns
 
-convert_file(textfile_path)
-text_to_csv(textfile_path, csv_path)
-print(get_rows_columns(csv_path))
+# Get the list of all files and directories
+dir_list = os.listdir(path)
+print(dir_list)
+
+for i in range(len(dir_list)):
+    convert_file(textfile_dir + dir_list[i])
+    text_to_csv(textfile_dir + dir_list[i], csv_path + dir_list[i][:-3] + "csv")
+    # print(get_rows_columns(csv_path + csv_path[:-3] + ".csv"))

@@ -1,9 +1,9 @@
-filtered_csv_path = "filtered_125Hz\\bidmc03m.csv"
-annotated_csv_path = "Annotated_125Hz\\bidmc03m.csv"
+filtered_csv_path = "code\BIDMC\\filtered_125Hz\\bidmc03m.csv"
+annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 # save annotations settings ;;; for testing the running code protects from accidental overwrite
 # of the csv file
-save_anno = True
+save_anno = False
 
 # sampling freq in HERTZ
 sampling_freq = 125 

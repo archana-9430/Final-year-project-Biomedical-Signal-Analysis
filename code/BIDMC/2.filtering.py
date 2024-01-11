@@ -1,12 +1,14 @@
-csv_data = "code\BIDMC\CSV_Data_125Hz\\bidmc03m.csv"
-filtered_data_file = "code\BIDMC\\filtered_125Hz\\bidmc03m.csv"
+csv_path = "CSV_Data_125Hz\\"
+filtered_path = "filtered_125Hz\\"
+path = "CSV_Data_125Hz"
 
 import pandas as pd
 import numpy as np
 from scipy.signal import butter, filtfilt
 import matplotlib.pyplot as plt
+import os
 
-def butterworth_bp_filter(data_file, order, fs, lowcut, highcut):
+def butterworth_bp_filter(data_file, order, fs, lowcut, highcut, filtered_data_file):
     df = pd.read_csv(data_file, header=None)
     data = df.values.flatten()
     t = np.linspace(0, len(data) - 1, len(data))
@@ -35,10 +37,15 @@ def butterworth_bp_filter(data_file, order, fs, lowcut, highcut):
     plt.plot(t, filtered_data, 'r-', linewidth = 2, label='Filtered Data')
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
-    plt.title(str(order) + ' Order Butterworth Bandpass Filter')
+    plt.title(data_file[len(path) - 1: ] + ": " + str(order) + ' Order Butterworth Bandpass Filter')
     plt.legend()
     plt.grid(True)
     plt.show()
     
-butterworth_bp_filter(csv_data, 4, 125, 0.2, 4)
+# Get the list of all files and directories
+dir_list = os.listdir(path)
+print(dir_list)
+
+for i in range(len(dir_list)):
+    butterworth_bp_filter(csv_path + dir_list[i], 4, 125, 0.2, 4, filtered_path + dir_list[i])
 
