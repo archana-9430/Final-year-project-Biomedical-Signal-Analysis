@@ -22,7 +22,7 @@ def extract_features(segment):
     # value_counts = segment.value_counts(normalize=True)
  
     # features['entropy'] = entropy(value_counts, base=2)
-    features['entropy'] = shannon_entropy(segment)
+    features['Shannon entropy'] = shannon_entropy(segment)
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
     
@@ -33,7 +33,7 @@ def store_features(features_file, annotated_file):
     extracted_features = {col: extract_features(df[col]) for col in df}
     features_df = pd.DataFrame(extracted_features)
     features_df = features_df.T
-    features_df.to_csv(features_file)
+    features_df.to_csv(features_file, index = False)
     
     print(features_df)
     
