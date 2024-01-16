@@ -1,9 +1,12 @@
 filtered_csv_path = "code\BIDMC\\filtered_125Hz\\bidmc03m.csv"
-segmented_csv_path = "code\BIDMC\Semgmented_125Hz\\bidmc03m.csv"
+segmented_csv_path = "code\BIDMC\segmented_125Hz\\bidmc03m.csv"
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 sampling_freq = 125 # sampling freq in HERTZ
+
 window_len_sec = 10
+stride_len_sec = 6
+# in seconds
 
 # # global trimming variables
 # trim_ask = True
@@ -54,45 +57,45 @@ def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = N
 
 def segmentator():
     # extract original signal from the csv file and plot it
-    ppg_df = pd.read_csv(filtered_file_path)
-    time_stamp_original_signal = [ t/sampling_freq for t in range(original_signal.shape[0]) ] # time in seconds
+    ppg_df = pd.read_csv(filtered_csv_path , header = None)
+    ppg_data = ppg_df.iloc[ : , 0].tolist()
+    time_stamp_original_signal = [ t/sampling_freq for t in range(ppg_df.shape[0]) ] # time in seconds
 
     # plot the original signal
-    plot_signal(time_stamp_original_signal , ppg_df[1], "Time(s)", "PPG Signal" , "Original Signal")
+    plot_signal(time_stamp_original_signal , ppg_data, "Samples", "PPG Signal" , "Original Signal")
 
     # calculate some values
     signal_len = ppg_df.shape[0]
+    stride_samples = stride_len_sec * sampling_freq
     samples_per_window = int(window_len_sec * sampling_freq)
-    num_segments = signal_len / samples_per_window
+    num_segments = ( signal_len -  samples_per_window + stride_samples ) / stride_samples
     print("\nNumber of segments = {}".format(num_segments))
 
-    int_num_segment = int(num_segments)
+    int_num_segments = int(num_segments)
+    print("\nInteger Number segment = {}".format(int_num_segments))
     segmented_df = pd.DataFrame() # Create an empty dataframe to contain annotated data
 
-    for i in range(int_num_segment):
+    for i in range(int_num_segments):
         # take out the segment from the total signal
-        current_segment = signal.iloc[i * samples_per_window : (i + 1) * samples_per_window]
+        current_segment = ppg_data[i * stride_samples : i * stride_samples + samples_per_window]
+        # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , "Segment {}".format(i))
         segmented_df["Segment {}".format(i)] = current_segment
     
-    if(num_segments % 1):
-        i += 1
-        # calculate the remaining sample number
-        remaining_sample_num = signal_len - i * samples_per_window
+    # if(num_segments % 1):
+    #     # calculate the remaining sample number
+    #     remaining_sample_num = signal_len - (samples_per_window + i * stride_samples)
 
-        # take out the segment from the total signal and plot it
-        current_segment = signal[i * samples_per_window : i * samples_per_window + remaining_sample_num]
-        plot_signal(range(signal_len) , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
-        segmented_df["Segment {}".format(i)] = current_segment
+    #     i += 1
+    #     # take out the segment from the total signal and plot it
+    #     current_segment = ppg_data[i * stride_samples : i * stride_samples + remaining_sample_num]
+    #     plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , "Last Segment {}".format(i))
 
-        discard_seg = input("\nDiscard the last segment(y/n , Default: n)? ")
-        if(discard_seg == 'n'):
-            annot = take_annotation(i)
-            current_segment.insert(0 , annot)
-            zero_padd = [ 0 for i in range(0 , samples_per_window - remaining_sample_num)]
-            current_segment += zero_padd
-            segmented_df["Segment {}".format(i)] = current_segment
-
+    #     discard_seg = input("\nDiscard the last segment(y/n , Default: n)? ")
+    #     if(discard_seg == 'n'):
+    #         zero_padd = [ 0 for i in range(samples_per_window - remaining_sample_num) ]
+    #         current_segment += zero_padd
+    #         segmented_df["Segment {}".format(i)] = current_segment
     
-    segmented_df.to_csv(path_or_buf = segmented_csv_path , index = False) #save the file
+    segmented_df.to_csv(path_or_buf = segmented_csv_path , index = False , header = None) #save the file
 
 segmentator()
