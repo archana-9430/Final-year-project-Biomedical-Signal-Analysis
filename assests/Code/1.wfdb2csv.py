@@ -49,6 +49,20 @@ def mimic():
         if i%2 == 0:
             dat_to_csv(f"{mimic_path}\\{dir_list[i][:-4]}", csv_path + dir_list[i][:-3] + "csv")
             
+def txt_2_csv(input_txt_path, output_csv_path):
+    # Read the CSV file
+    df = pd.read_csv(input_txt_path)
+    df.to_csv(output_csv_path, index=False)
+    
+def mimic_10_min():
+    # Get the list of all .dat and .hea files
+    dir_list = os.listdir(mimic_10Min)
+    print(dir_list)
+    print(len(dir_list))
+    
+    for i in range(len(dir_list)):    
+        txt_2_csv(f"{mimic_10Min}\\{dir_list[i]}", csv_path + dir_list[i][:-3] + "csv")
+              
 def split_csv_columns(input_csv_path, csv_path):
     # Read the CSV file
     df = pd.read_csv(input_csv_path)
@@ -90,6 +104,7 @@ def mimic_perform_af():
 
 ##Uncomment this code for running this code
 # mimic()
+# mimic_10_min()
 # bidmc()
 # mimic_perform_af()
 # csl()
