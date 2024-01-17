@@ -7,6 +7,7 @@ All the csv files generated is passed to a common directory.
 csv_path = 'Csv_data\\'
 #MIMIC
 mimic_path = '..\\Mixed_dataset\\MIMIC'
+mimic_10Min = '..\\Mixed_dataset\\MIMIC_10MIn_125Hz'
 
 #BIDMC
 bidmc_csv_path = "..\\Mixed_dataset\\BIDMC\\bidmc_data_all_125Hz_8Min.csv"
@@ -90,5 +91,5 @@ def mimic_perform_af():
 ##Uncomment this code for running this code
 # mimic()
 # bidmc()
-mimic_perform_af()
+# mimic_perform_af()
 # csl()
