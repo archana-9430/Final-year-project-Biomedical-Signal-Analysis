@@ -41,7 +41,7 @@ def check_n_uniform():
             # over 10 min length 
             uniformer(data_file , csv , uniform_csv_fol)
         else:
-            # already 10 min length so simply save them there
+            # already 10 min length or less so simply save them
             data_file.to_csv(path_or_buf = f"{uniform_csv_fol}\\Uniformed_{csv}" , index = False , header = None)
 
 
