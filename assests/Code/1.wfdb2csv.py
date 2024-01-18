@@ -18,9 +18,13 @@ csl_csv_path = "..\\Mixed_dataset\\csl_benchmark_data_125Hz_1hr\\csl_benchmark_d
 #MIMIC PERForm AF
 perform_dir = "..\\Mixed_dataset\\mimic_perform_af_csv"
 
+#DaLiA
+dalia_path = "assests\\Mixed_dataset\\DaLiA Dataset"
+
 import os
 import wfdb
 import pandas as pd
+from upsample_DaLiA import DaLiA
 
 def dat_to_csv(record_name, output_csv_path):
     # Read the record
@@ -108,3 +112,4 @@ def mimic_perform_af():
 # bidmc()
 # mimic_perform_af()
 # csl()
+# DaLiA(dalia_path)
