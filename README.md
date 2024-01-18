@@ -2,8 +2,14 @@
 -----------------------------------------------
 
 ML/DL based PPG signal analysis and processing for disease identification and related hardware implementation.
+## Current Work:
+### Dataset preparation: 
+* Diffrent publickly avaialble datasets are used like, BIDMC dataset(15 subjects), MIMIC III dataset(15+2 subjects), MIMIC PERForm AF dataset(19 subjects), CSL Benchmark dataset(2 subjects).
+* The frequency of all the dataset is made equal to 125Hz,and the duration of the segment of each subjects is kept 8min(BIDMC) or 10min(others) long.
+* Smaller segments of 10 secs window are created. Overlapping segmentation is used (10Hz/6Hz).
+* Total number of segments obtained are 6732, out of which 3366 are used for train and remaining 3366 are used for test.
 
-## Current work:
+## Initial work done on BIDMC datatset(exploring phase):
 #### 1. Started working on a 125Hz PPG signal dataset with 8min long segments.
 #### 2. The flow of work is: 
     a) Text to csv (make it columnwise, ie., having a single row) 
