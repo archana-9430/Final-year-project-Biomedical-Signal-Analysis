@@ -1,6 +1,6 @@
 mimic 3 waveform database: 
 record: 
-3500015_0002
+3500015_0002 segments: 23
 3500020_0006
 3500039_0003
 3500101_0005
