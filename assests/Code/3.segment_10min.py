@@ -66,6 +66,6 @@ def uniformer(ppg_df , csv_name , uniform_csv_folder):
         current_segment = ppg_data[i * stride_samples : i * stride_samples + samples_per_window]
         plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , f"{csv_name}: Segment {i + 1}")
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
-        uniform_df.to_feather(f"{uniform_csv_folder}\\Uniformed_{csv_name[ : -4]}_Segment_{i}.fthr")
+        uniform_df.to_csv(f"{uniform_csv_folder}\\Uniformed_{csv_name[ : -4]}_Segment_{i}.fthr")
         
 check_n_uniform()
