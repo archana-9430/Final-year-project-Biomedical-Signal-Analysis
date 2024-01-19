@@ -8,9 +8,9 @@ It also outputs a txt file (named "processed_files.txt") which have a list of cs
 by the script in "report_folder"
 '''
 
-csv_path = 'assests\\Code\\Csv_data'
-csv_noise_path = "assests\\Code\\Csv_noise_DaLiA"
-report_folder = "assests\\Code"
+csv_path = '..\\Csv_data'
+csv_noise_path = "..\\Csv_noise_DaLiA"
+report_folder = "..\\Code"
 
 # sampling frequencies in Hz
 original_acc_samp_freq = 32
