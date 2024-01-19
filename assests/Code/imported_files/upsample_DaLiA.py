@@ -8,9 +8,9 @@ It also outputs a txt file (named "processed_files.txt") which have a list of cs
 by the script in "report_folder"
 '''
 
-csv_path = 'assests\Code\Csv_data'
-csv_noise_path = "assests\Code\Csv_noise_DaLiA"
-report_folder = "assests\Code"
+csv_path = 'assests\\Code\\Csv_data'
+csv_noise_path = "assests\\Code\\Csv_noise_DaLiA"
+report_folder = "assests\\Code"
 
 # sampling frequencies in Hz
 original_acc_samp_freq = 32
@@ -45,7 +45,6 @@ def BVP_upsample(original_path , upsampled_path):
     data_df = pd.DataFrame(resampled_data_list)
     data_df.to_feather(upsampled_path)
     processed_files.append(f"{original_path}")
-    return
 
 def ACC_upsample(original_acc_path , upsampled_path):
 
@@ -62,7 +61,6 @@ def ACC_upsample(original_acc_path , upsampled_path):
     data_acc_df = pd.DataFrame(resampled_data_list_acc)
     data_acc_df.to_feather(upsampled_path)
     processed_files.append(f"{original_acc_path}")
-    return
 
 def recursive(object_path , entry_name):
     obj = os.scandir(object_path)

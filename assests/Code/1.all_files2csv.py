@@ -24,7 +24,7 @@ dalia_path = "assests\\Mixed_dataset\\DaLiA Dataset"
 import os
 import wfdb
 import pandas as pd
-from upsample_DaLiA import DaLiA
+from imported_files.upsample_DaLiA import DaLiA
 
 def dat_to_csv(record_name, output_csv_path):
     # Read the record
