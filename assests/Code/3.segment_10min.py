@@ -37,22 +37,23 @@ def check_n_uniform():
     for csv in file_list:
         csv_path = f"{csv_data_fol}\\{csv}"
         # open each one by one
-        data_file = pd.read_csv(csv_path , low_memory = False , dtype = float)
-        if(data_file.shape[0] > sampling_freq * window_len_sec):
+        # data_file = pd.read_csv(csv_path , low_memory = False , dtype = float)
+        data_file = np.loadtxt(csv_path , delimiter = ',' , skiprows = 1)
+        if(len(data_file) > sampling_freq * window_len_sec + 1):
             # over 10 min length 
-            uniformer(data_file , csv , uniform_csv_fol)
+            uniformer(data_file , f"{uniform_csv_fol}\\{csv}")
         else:
             # already 10 min length or less so simply save them
-            data_file.to_csv(path_or_buf = f"{uniform_csv_fol}\\Uniformed_{csv}" , index = False)
+            data_file.to_csv(path_or_buf = f"{uniform_csv_fol}\\{csv}" , index = False)
 
 
-def uniformer(ppg_df , csv_name , uniform_csv_folder):
+def uniformer(ppg_np , save_path):
     # extract original signal from the csv file and plot it
-    ppg_data = ppg_df.iloc[ : , 0].tolist()
+    # ppg_data = ppg_df.iloc[ : , 0].tolist()
 
     # calculate some values
-    signal_len = ppg_df.shape[0]
-    print(f"\nFile name = {csv_name}")
+    signal_len = len(ppg_np)
+    print(f"\nFile name = {save_path}")
     print(f"Signal Len = {signal_len}")
     stride_samples = stride_len_sec * sampling_freq
     samples_per_window = int(window_len_sec * sampling_freq) + 1
@@ -63,9 +64,9 @@ def uniformer(ppg_df , csv_name , uniform_csv_folder):
 
     for i in range(int_num_segments):
         # take out the segment from the total signal
-        current_segment = ppg_data[i * stride_samples : i * stride_samples + samples_per_window]
+        current_segment = ppg_np[i * stride_samples : i * stride_samples + samples_per_window]
         # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , f"{csv_name}: Segment {i + 1}")
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
-        uniform_df.to_csv(f"{uniform_csv_folder}\\{csv_name[ : -4]}_Segment_{i}.csv")
+        uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i}.csv" , index = False)
         
 check_n_uniform()
