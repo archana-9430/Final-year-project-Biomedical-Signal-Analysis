@@ -43,7 +43,7 @@ def BVP_upsample(original_path , upsampled_path):
     resampled_data_list = resample(data_list , num_samples)
 
     data_df = pd.DataFrame(resampled_data_list)
-    data_df.to_feather(upsampled_path)
+    data_df.to_csv(upsampled_path, index=False)
     processed_files.append(f"{original_path}")
 
 def ACC_upsample(original_acc_path , upsampled_path):
@@ -59,7 +59,7 @@ def ACC_upsample(original_acc_path , upsampled_path):
     resampled_data_list_acc = resample(data_list_acc , num_samples_acc)
 
     data_acc_df = pd.DataFrame(resampled_data_list_acc)
-    data_acc_df.to_feather(upsampled_path)
+    data_acc_df.to_csv(upsampled_path, index=False)
     processed_files.append(f"{original_acc_path}")
 
 def recursive(object_path , entry_name):
