@@ -8,9 +8,9 @@ It also outputs a txt file (named "processed_files.txt") which have a list of cs
 by the script in "report_folder"
 '''
 
-csv_path = '..\\Csv_data'
-csv_noise_path = "..\\Csv_noise_DaLiA"
-report_folder = "..\\Code"
+csv_path = 'Csv_data'
+csv_noise_path = "Csv_noise_DaLiA"
+report_folder = "Code"
 
 # sampling frequencies in Hz
 original_acc_samp_freq = 32
@@ -68,10 +68,10 @@ def recursive(object_path , entry_name):
 
         if entry.is_file() and len(entry.name.split('.')) > 1:
             if  entry.name == "BVP.csv":
-                BVP_upsample(f"{object_path}\\{entry.name}" , f"{csv_path}\\{entry_name}_125Hz.fthr")
+                BVP_upsample(f"{object_path}\\{entry.name}" , f"{csv_path}\\{entry_name}_125Hz.csv")
             
             if entry.name == "ACC.csv":
-                ACC_upsample(f"{object_path}\\{entry.name}" , f"{csv_noise_path}\\{entry_name}_Noise_125Hz.fthr")
+                ACC_upsample(f"{object_path}\\{entry.name}" , f"{csv_noise_path}\\{entry_name}_Noise_125Hz.csv")
 
         elif entry.is_dir():
             recursive(f"{object_path}\\{entry.name}" , f"{entry.name}")

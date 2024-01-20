@@ -37,8 +37,7 @@ def check_n_uniform():
     for csv in file_list:
         csv_path = f"{csv_data_fol}\\{csv}"
         # open each one by one
-        # data_file = pd.read_csv(csv_path , low_memory = False , dtype = float)
-        data_file = np.loadtxt(csv_path , delimiter = ',' , skiprows = 1)
+        data_file = np.loadtxt(csv_path , delimiter = ',' , skiprows = 1 , encoding = None)
         if(len(data_file) > sampling_freq * window_len_sec + 1):
             # over 10 min length 
             uniformer(data_file , f"{uniform_csv_fol}\\{csv}")
@@ -67,6 +66,6 @@ def uniformer(ppg_np , save_path):
         current_segment = ppg_np[i * stride_samples : i * stride_samples + samples_per_window]
         # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , f"{csv_name}: Segment {i + 1}")
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
-        uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i}.csv" , index = False)
+        uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i + 1}.csv" , index = False)
         
 check_n_uniform()
