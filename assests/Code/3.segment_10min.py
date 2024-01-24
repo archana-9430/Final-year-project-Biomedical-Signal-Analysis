@@ -38,12 +38,13 @@ def check_n_uniform():
         csv_path = f"{csv_data_fol}\\{csv}"
         # open each one by one
         data_file = np.loadtxt(csv_path , delimiter = ',' , skiprows = 1 , encoding = None)
+        df = pd.DataFrame(data_file)
         if(len(data_file) > sampling_freq * window_len_sec + 1):
             # over 10 min length 
             uniformer(data_file , f"{uniform_csv_fol}\\{csv}")
         else:
             # already 10 min length or less so simply save them
-            data_file.to_csv(path_or_buf = f"{uniform_csv_fol}\\{csv}" , index = False)
+            df.to_csv(path_or_buf = f"{uniform_csv_fol}\\{csv}" , index = False)
 
 
 def uniformer(ppg_np , save_path):
