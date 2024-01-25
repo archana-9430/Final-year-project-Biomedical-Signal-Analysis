@@ -1,5 +1,5 @@
-filtered_csv_path = "code\BIDMC\\filtered_125Hz\\bidmc03m.csv"
-segmented_csv_path = "code\BIDMC\segmented_125Hz\\bidmc03m.csv"
+filtered_folder = "filtered_csv_data"
+segmented_folder = "10sec_segmented_data"
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 sampling_freq = 125 # sampling freq in HERTZ
@@ -11,6 +11,7 @@ stride_len_sec = 6
 
 import pandas as pd
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 
 def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = None):
@@ -22,14 +23,14 @@ def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = N
     plt.show()
     plt.close()
 
-def segmentator():
+def segmentator(filtered_csv_path , segmented_csv_path):
     # extract original signal from the csv file and plot it
-    ppg_df = pd.read_csv(filtered_csv_path , header = None)
+    ppg_df = pd.read_csv(filtered_csv_path)
     ppg_data = ppg_df.iloc[ : , 0].tolist()
-    time_stamp_original_signal = [ t/sampling_freq for t in range(ppg_df.shape[0]) ] # time in seconds
+    # time_stamp_original_signal = [ t/sampling_freq for t in range(ppg_df.shape[0]) ] # time in seconds
 
     # plot the original signal
-    plot_signal(time_stamp_original_signal , ppg_data, "Samples", "PPG Signal" , "Original Signal")
+    # plot_signal(time_stamp_original_signal , ppg_data, "Samples", "PPG Signal" , "Original Signal")
 
     # calculate some values
     signal_len = ppg_df.shape[0]
@@ -49,6 +50,9 @@ def segmentator():
         # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , "Segment {}".format(i))
         segmented_df[f"Segment {i + 1}"] = current_segment
     
-    segmented_df.to_csv(path_or_buf = segmented_csv_path , index = False , header = None) #save the file
-    
-segmentator()
+    segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
+
+csv_list = os.listdir(filtered_folder)
+
+for csv_file in csv_list:
+    segmentator(f"{filtered_folder}//{csv_file}" , f"{segmented_folder}//{csv_file}")
