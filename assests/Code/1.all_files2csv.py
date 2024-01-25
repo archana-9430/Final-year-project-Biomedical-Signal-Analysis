@@ -23,6 +23,7 @@ dalia_path = "..\\Mixed_dataset\\DaLiA_Dataset"
 
 import os
 import wfdb
+import datatable as dt
 import pandas as pd
 from imported_files.upsample_DaLiA import DaLiA
 
@@ -55,7 +56,9 @@ def mimic():
             
 def txt_2_csv(input_txt_path, output_csv_path):
     # Read the CSV file
-    df = pd.read_csv(input_txt_path)
+    dt_df = dt.fread(input_txt_path)
+    df = dt_df.to_pandas()
+    df.dropna()
     df.to_csv(output_csv_path, index=False)
     
 def mimic_10_min():
@@ -64,12 +67,14 @@ def mimic_10_min():
     print(dir_list)
     print(len(dir_list))
     
-    for i in range(len(dir_list)):    
-        txt_2_csv(f"{mimic_10Min}\\{dir_list[i]}", csv_path + dir_list[i][:-3] + "csv")
+    for csv in dir_list:    
+        txt_2_csv(f"{mimic_10Min}\\{csv}", csv_path + csv[:-3] + "csv")
               
 def split_csv_columns(input_csv_path, csv_path):
     # Read the CSV file
-    df = pd.read_csv(input_csv_path)
+    dt_df = dt.fread(input_csv_path)
+    df = dt_df.to_pandas()
+    df.dropna()
 
     # Iterate over columns and create separate CSV files
     for column_name in df.columns:
@@ -85,12 +90,16 @@ def csl():
     
 def extract_ppg_col(input_csv_path, output_csv_path):
     # Read the CSV file
-    df = pd.read_csv(input_csv_path)
+    dt_df = dt.fread(input_csv_path)
+    df = dt_df.to_pandas()
 
     # Extract the "PPG" column
     ppg_column = df["PPG"]
     # Create a new DataFrame with only the "PPG" column
     ppg_df = pd.DataFrame({"PPG": ppg_column})
+
+    # Drop any NaN Values
+    ppg_df.dropna()
 
     # Save the new DataFrame to a CSV file
     ppg_df.to_csv(output_csv_path, index=False)
@@ -112,4 +121,4 @@ def mimic_perform_af():
 # bidmc()
 # mimic_perform_af()
 # csl()
-DaLiA(dalia_path)
+# DaLiA(dalia_path)

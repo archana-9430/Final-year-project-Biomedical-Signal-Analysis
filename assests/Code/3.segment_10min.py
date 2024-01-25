@@ -5,7 +5,7 @@ ten_min_csv_fol = "10min_csv_data"
 
 '''
 The script takes csv files from "Csv_data" folder and then makes the signal of 10 min 
-and save the output csv to folder "uniformed_csv_data".
+and save the output csv to folder "10min_csv_data".
 For that purpose it assumes sampling frequency as specified in the variable "sampling_freq"
 '''
 
@@ -65,35 +65,11 @@ def uniformer(ppg_df , save_path):
     for i in range(int_num_segments):
         # take out the segment from the total signal
         current_segment = ppg_list[i * stride_samples : i * stride_samples + samples_per_window]
+
+        # if you want to suppress the plotting then comment out the following line
         plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , f"{save_path}: Segment {i + 1}")
+        
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
         uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i + 1}.csv" , index = False)
-        
-def plot_csv_data(csv_file, fig_num):
-    # Read the CSV file
-    df = pd.read_csv(csv_file)
-    df.info()
-    # Extract the single column
-    data_column = df.iloc[:, 0]
-    print(range(len(data_column)))
-
-    # Plot the data
-    # plt.figure(fig_num)
-    plt.plot(range(len(data_column)), data_column)
-    plt.title(csv_file)
-    plt.xlabel("time")
-    plt.ylabel("PPG Signal")
-    plt.grid(True)
-    plt.show()
-    
-def plot_csv(csv_path):
-    dir_list = os.listdir(csv_path)
-    print(len(dir_list))
-
-    fig_num = 0
-    for csv_file in dir_list:
-        fig_num += 1
-        plot_csv_data(f"{csv_path}\\{csv_file}", fig_num)
 
 check_n_uniform()
-# plot_csv(ten_min_csv_fol)
