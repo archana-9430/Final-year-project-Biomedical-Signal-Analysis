@@ -44,7 +44,7 @@ def check_n_uniform():
             uniformer(data_file , f"{uniform_csv_fol}\\{csv}")
         else:
             # already 10 min length or less so simply save them
-            df.to_csv(path_or_buf = f"{uniform_csv_fol}\\{csv}" , index = False)
+            df.to_csv(path_or_buf = f"{uniform_csv_fol}\\{csv}" , index = False, header=False)
 
 
 def uniformer(ppg_np , save_path):
@@ -69,4 +69,28 @@ def uniformer(ppg_np , save_path):
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
         uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i + 1}.csv" , index = False)
         
+def plot_csv_data(csv_file, fig_num):
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    # Extract the single column
+    data_column = df.iloc[:, 0]
+
+    # Plot the data
+    plt.figure(fig_num)
+    plt.plot(df.index, data_column, label=df.columns[0])
+    plt.title(csv_file)
+    plt.xlabel("time")
+    plt.ylabel("PPG Signal")
+    plt.show()
+    
+def plot_csv(csv_path):
+    dir_list = os.listdir(csv_path)
+    print(len(dir_list))
+
+    fig_num = 0
+    for csv_file in dir_list:
+        fig_num += 1
+        plot_csv_data(f"{csv_path}\\{csv_file}", fig_num)
+
 check_n_uniform()
+plot_csv(uniform_csv_fol)
