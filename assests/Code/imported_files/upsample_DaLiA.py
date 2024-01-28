@@ -20,6 +20,7 @@ target_samp_freq =125
 # libraries
 import matplotlib.pyplot as plt
 from scipy.signal import resample
+import datatable as dt
 import pandas as pd
 import numpy as np
 import os
@@ -35,7 +36,8 @@ def list_to_string(x : list):
 
 def BVP_upsample(original_path , upsampled_path):
 
-    org_data = pd.read_csv(original_path)
+    data_dt = dt.fread(original_path)
+    org_data = data_dt.to_pandas().dropna()
 
     data_list = org_data.iloc[ : , 0]  
 
@@ -48,7 +50,8 @@ def BVP_upsample(original_path , upsampled_path):
 
 def ACC_upsample(original_acc_path , upsampled_path):
 
-    acc_org_data = pd.read_csv(original_acc_path)
+    data_dt = dt.fread(original_acc_path)
+    acc_org_data = data_dt.to_pandas().dropna()
 
     data_list_x = np.array(acc_org_data.iloc[ : , 0])
     data_list_y = np.array(acc_org_data.iloc[ : , 1])
