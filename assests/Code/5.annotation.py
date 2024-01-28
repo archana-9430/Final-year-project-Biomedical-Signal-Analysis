@@ -59,7 +59,7 @@ def annotator(segmented_file_path , annotated_file_path):
         
         # save on each annotation
         if(save_anno == True):
-            annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save on each segment
+            annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) # save on each segment
 
     if(save_anno == True):
         annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file

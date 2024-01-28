@@ -4,9 +4,12 @@ segmented_folder = "10sec_segmented_data"
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 sampling_freq = 125 # sampling freq in HERTZ
 
+# in seconds
 window_len_sec = 10
 stride_len_sec = 6
-# in seconds
+
+# debug only 
+save = False
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import pandas as pd
@@ -50,7 +53,8 @@ def segmentator(filtered_csv_path , segmented_csv_path):
         # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , "Segment {}".format(i))
         segmented_df[f"Segment {i + 1}"] = current_segment
     
-    segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
+    if save:
+        segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
 
 csv_list = os.listdir(filtered_folder)
 

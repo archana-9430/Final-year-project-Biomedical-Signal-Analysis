@@ -14,16 +14,22 @@ sampling_freq = 125 # sampling freq in HERTZ
 
 window_len_sec = 10*60 # in seconds
 stride_len_sec = window_len_sec
+
+# debug only...
+save = True
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import pandas as pd
+import datatable as dt
 import numpy as np
 import os
+from imported_files.snr import snr_csv
 import matplotlib.pyplot as plt
 
-def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = None):
-    plt.grid(True)
+def plot_signal(fig_num:int, x : list ,y : list , x_label:str = None , y_label:str = None , title:str = None) -> None:
+    plt.figure(fig_num)
     plt.plot(x,y)
+    plt.grid(True)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
@@ -37,20 +43,22 @@ def check_n_uniform():
     for csv in file_list:
         csv_path = f"{csv_data_fol}\\{csv}"
         # open each one by one
-        data_file = pd.read_csv(csv_path)
-        data_file.dropna()
-        if(len(data_file) > sampling_freq * window_len_sec + 1):
+        data_dt = dt.fread(csv_path)
+        data_file = data_dt.to_pandas()
+        data = data_file.dropna()
+        if(data.shape[0] > sampling_freq * window_len_sec + 1):
             # over 10 min length 
-            uniformer(data_file , f"{ten_min_csv_fol}\\{csv}")
+            uniformer(data , f"{ten_min_csv_fol}\\{csv}")
         else:
             # already 10 min length or less so simply save them
-            data_file.to_csv(path_or_buf = f"{ten_min_csv_fol}\\{csv}" , index = False, header=False)
+            if save:
+                data.to_csv(path_or_buf = f"{ten_min_csv_fol}\\{csv}" , index = False)
 
 
-def uniformer(ppg_df , save_path):
-
+def uniformer(ppg_df:pd.DataFrame , save_path:str) -> None:
+    
     # calculate some values
-    signal_len = ppg_df.shape[0]
+    signal_len = len(ppg_df)
     print(f"\nFile name = {save_path}")
     print(f"Signal Len = {signal_len}")
     stride_samples = stride_len_sec * sampling_freq
@@ -60,16 +68,46 @@ def uniformer(ppg_df , save_path):
     num_segments = ( signal_len -  samples_per_window + stride_samples ) / stride_samples
     int_num_segments = int(num_segments)
     print(f"Number of segments = {num_segments}")
-    ppg_list = ppg_df.iloc[ : , 0].tolist()
+    ppg_list = ppg_df.values
 
     for i in range(int_num_segments):
         # take out the segment from the total signal
         current_segment = ppg_list[i * stride_samples : i * stride_samples + samples_per_window]
 
         # if you want to suppress the plotting then comment out the following line
-        plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , f"{save_path}: Segment {i + 1}")
+        plot_signal(i + 1 , range(samples_per_window) , current_segment , "Samples", "PPG Signal" , f"{save_path}: Segment {i + 1}")
         
         uniform_df = pd.DataFrame(data = current_segment , columns = [f"Segment {i + 1}"])
-        uniform_df.to_csv(f"{save_path[ : -4]}_Segment_{i + 1}.csv" , index = False)
+        if save:
+            save_pathh = f"{save_path[ : -4]}_Segment_{i + 1}.csv"
+            uniform_df.to_csv( save_pathh, index = False)
+            print(f"   SNR of Segment {i + 1} = {snr_csv(save_pathh , sampling_freq)}")
 
-check_n_uniform()
+        
+def plot_csv_data(csv_file:str, fig_num):
+    # Read the CSV file
+    df_dt = dt.fread(csv_file)
+    df = df_dt.to_pandas()
+    # Extract the single column
+    data_column = df.values
+    print(range(len(df)))
+
+    # Plot the data
+    plt.figure(fig_num)
+    plt.plot(range(len(df)), data_column)
+    plt.title(csv_file)
+    plt.xlabel("time")
+    plt.ylabel("PPG Signal")
+    plt.show()
+    
+def plot_csv(csv_path:str):
+    dir_list = os.listdir(csv_path)
+    print(len(dir_list))
+
+    fig_num = 0
+    for csv_file in dir_list:
+        fig_num += 1
+        plot_csv_data(f"{csv_path}\\{csv_file}", fig_num)
+
+# check_n_uniform()
+plot_csv(ten_min_csv_fol)

@@ -1,9 +1,11 @@
-''''
+'''
 This file converts the MIMIC III Waveform dataset (.dat and .hea files) to csv files. 
 It extracts the column for PLETH, removes the NaN values and stores it to the csv file.
 It also extracts PPG data from BIDMC and MIMIC PERForm AF dataset and stores it to a csv file.
 All the csv files generated is passed to a common directory.
+It also drops any NaN value in any of the csv files
 '''
+
 csv_path = 'Csv_data\\'
 #MIMIC
 mimic_path = '..\\Mixed_dataset\\MIMIC'
@@ -58,7 +60,7 @@ def txt_2_csv(input_txt_path, output_csv_path):
     # Read the CSV file
     dt_df = dt.fread(input_txt_path)
     df = dt_df.to_pandas()
-    df.dropna()
+    df = df.dropna()
     df.to_csv(output_csv_path, index=False)
     
 def mimic_10_min():
@@ -74,7 +76,7 @@ def split_csv_columns(input_csv_path, csv_path):
     # Read the CSV file
     dt_df = dt.fread(input_csv_path)
     df = dt_df.to_pandas()
-    df.dropna()
+    df = df.dropna()
 
     # Iterate over columns and create separate CSV files
     for column_name in df.columns:
@@ -99,7 +101,7 @@ def extract_ppg_col(input_csv_path, output_csv_path):
     ppg_df = pd.DataFrame({"PPG": ppg_column})
 
     # Drop any NaN Values
-    ppg_df.dropna()
+    ppg_df = ppg_df.dropna()
 
     # Save the new DataFrame to a CSV file
     ppg_df.to_csv(output_csv_path, index=False)
