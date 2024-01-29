@@ -64,7 +64,7 @@ def butterworth_bp_filter(data_file_path, order, fs, lowcut, highcut, filtered_d
     
 # Get the list of all files and directories
 csv_list = os.listdir(ten_sec_folder)
-pprint(f"{csv_list}, {len(csv_list)}")
+print(f"{csv_list}, {len(csv_list)}")
 
 for csv_file in csv_list:
     butterworth_bp_filter(f"{ten_sec_folder}\\{csv_file}",
