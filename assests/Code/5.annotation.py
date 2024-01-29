@@ -6,7 +6,7 @@ annotated_folder = "10sec_annotated_data"
 # window_len_sec = 10
 
 # class list
-class_list = ["0" , "1" , "2"] # good segn = 0 , partly corrupted signal = 1 , corrupted = 2
+class_list = ["0" , "1" , "2"] # good segn = 0 , partly clean signal = 1 , corrupted = 2
 
 #for debugging only
 save_anno = True
@@ -39,14 +39,14 @@ def annotator(segmented_file_path , annotated_file_path):
 
     # annotation starts
     print("\n~~~~~ANNOTATION Starts~~~~~~\n")
-    print("Good Signal = Class 0\nCorrupted Signal = Class 1\n ")
+    print("Good Signal = Class 0\nPartly Clean Signal = Class 1\nCorrupted Signal = Class 2")
 
     num_segments = ppg_df.shape[1]
     annotation_df = pd.DataFrame() # Create an empty dataframe to contain annotated data
 
     for i in range(1 , num_segments + 1):
         # take out the segment from the total signal
-        current_segment = ppg_df[i]
+        current_segment = ppg_df[f"Segment {i}"].to_list()
         
         # plot the signal
         plot_signal(range(len(current_segment)) , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
@@ -64,8 +64,6 @@ def annotator(segmented_file_path , annotated_file_path):
 
     if(save_anno == True):
         annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
-    annotation_df.close()
-    ppg_df.close()
 
 
 # Get the list of all files and directories
