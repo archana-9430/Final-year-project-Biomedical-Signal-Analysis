@@ -1,5 +1,5 @@
-segmented_csv_path = "code\BIDMC\segmented_125Hz"
-annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
+segmented_folder= "10sec_segmented_data"
+annotated_folder = "10sec_annotated_data"
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 # sampling_freq = 125 # sampling freq in HERTZ
@@ -9,11 +9,12 @@ annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
 class_list = ["0" , "1" , "2"] # good segn = 0 , partly corrupted signal = 1 , corrupted = 2
 
 #for debugging only
-save_anno = False
+save_anno = True
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = None):
     plt.grid(True)
@@ -53,7 +54,7 @@ def annotator(segmented_file_path , annotated_file_path):
         # ask for annotation
         annot = take_annotation(i)
 
-        #save the annotation 
+        # save the annotation 
         current_segment.insert(0,annot)
         annotation_df["Segment {}".format(i)] = current_segment
         
@@ -66,4 +67,14 @@ def annotator(segmented_file_path , annotated_file_path):
     annotation_df.close()
     ppg_df.close()
 
-annotator(segmented_csv_path , annotated_csv_path)
+
+# Get the list of all files and directories
+csv_list = os.listdir(segmented_folder)
+print(f"{csv_list}, {len(csv_list)}")
+# for csv_file in csv_list:
+#     print(f"{segmented_folder}\\{csv_file}")
+
+for csv_file in csv_list:
+    annotator(f"{segmented_folder}\\{csv_file}", 
+              f"{annotated_folder}\\{csv_file}"
+             )
