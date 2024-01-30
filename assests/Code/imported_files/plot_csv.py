@@ -3,7 +3,7 @@ This file plots all the csv data. This is done to get a picture of the overall s
 It will help identify the desired 10min segments from larger datasets.
 '''
 
-csv_path = 'Csv_data'
+csv_path = '10min_csv_data'
 
 import os
 import pandas as pd

@@ -5,9 +5,8 @@ It also extracts PPG data from BIDMC and MIMIC PERForm AF dataset and stores it 
 All the csv files generated is passed to a common directory.
 It also drops any NaN value in any of the csv files
 '''
-import imported_files.paths_n_vars as pNv
-
-output_folder = pNv.csv_data_fol
+from imported_files.paths_n_vars import csv_data_fol
+output_folder = csv_data_fol
 
 #MIMIC
 mimic_path = '..\\Mixed_dataset\\MIMIC'
@@ -49,7 +48,7 @@ def dat_to_csv(record_name, output_csv_path):
     # Save to CSV
     df.to_csv(output_csv_path, index=False)
      
-async def mimic():
+def mimic():
     # Get the list of all .dat and .hea files
     dir_list = os.listdir(mimic_path)
     pprint(dir_list)
@@ -66,7 +65,7 @@ def txt_2_csv(input_txt_path, output_csv_path):
     df = df.dropna()
     df.to_csv(output_csv_path, index=False)
     
-async def mimic_10_min():
+def mimic_10_min():
     # Get the list of all .dat and .hea files
     dir_list = os.listdir(mimic_10Min)
     pprint(dir_list)
@@ -84,13 +83,13 @@ def split_csv_columns(input_csv_path, csv_path):
     # Iterate over columns and create separate CSV files
     for column_name in df.columns:
         column_data = df[column_name]
-        output_csv_path = csv_path + f"{column_name}.csv"
+        output_csv_path = csv_path + "\\" + f"{column_name}.csv"
         column_data.to_csv(output_csv_path, index=False)
         
-async def bidmc():
+def bidmc():
     split_csv_columns(bidmc_csv_path, output_folder)
     
-async def csl():
+def csl():
     split_csv_columns(csl_csv_path, output_folder)
     
 def extract_ppg_col(input_csv_path, output_csv_path):
@@ -109,7 +108,7 @@ def extract_ppg_col(input_csv_path, output_csv_path):
     # Save the new DataFrame to a CSV file
     ppg_df.to_csv(output_csv_path, index=False)
     
-async def mimic_perform_af():
+def mimic_perform_af():
     dir_list = os.listdir(perform_dir)
     pprint(dir_list)
     print(len(dir_list))
@@ -120,7 +119,7 @@ async def mimic_perform_af():
         extract_ppg_col(f"{perform_dir}\\{csv_input}", output_csv_path)
 
 
-##Uncomment this code for running this code
+# #Uncomment this code for running this code
 # mimic()
 # mimic_10_min()
 # bidmc()
