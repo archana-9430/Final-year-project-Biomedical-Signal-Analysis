@@ -1,10 +1,9 @@
-segmented_folder= "10sec_segmented_data"
-annotated_folder = "10sec_annotated_data"
+from imported_files.paths_n_vars import segmented_folder , annotated_folder
+
+input_folder = segmented_folder
+output_folder = annotated_folder
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
-# sampling_freq = 125 # sampling freq in HERTZ
-# window_len_sec = 10
-
 # class list
 class_list = ["0" , "1" , "2"] # good segn = 0 , partly clean signal = 1 , corrupted = 2
 
@@ -67,12 +66,12 @@ def annotator(segmented_file_path , annotated_file_path):
 
 
 # Get the list of all files and directories
-csv_list = os.listdir(segmented_folder)
+csv_list = os.listdir(input_folder)
 print(f"{csv_list}, {len(csv_list)}")
 # for csv_file in csv_list:
 #     print(f"{segmented_folder}\\{csv_file}")
 
 for csv_file in csv_list:
-    annotator(f"{segmented_folder}\\{csv_file}", 
-              f"{annotated_folder}\\{csv_file}"
+    annotator(f"{input_folder}\\{csv_file}", 
+              f"{output_folder}\\{csv_file}"
              )

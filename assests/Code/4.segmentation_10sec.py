@@ -1,13 +1,10 @@
-filtered_folder = "filtered_csv_data"
-segmented_folder = "10sec_segmented_data"
+from imported_files.paths_n_vars import filtered_folder, segmented_folder \
+                                        , sampling_frequency, window_len_seconds,\
+                                         shift_len_seconds
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
-sampling_freq = 125 # sampling freq in HERTZ
-
-# in seconds
-window_len_sec = 10
-stride_len_sec = 6
-
+input_folder = filtered_folder
+output_folder = segmented_folder
 # debug only 
 save = False
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,7 +27,7 @@ def segmentator(filtered_csv_path , segmented_csv_path):
     # extract original signal from the csv file and plot it
     ppg_df = pd.read_csv(filtered_csv_path)
     ppg_data = ppg_df.iloc[ : , 0].tolist()
-    # time_stamp_original_signal = [ t/sampling_freq for t in range(ppg_df.shape[0]) ] # time in seconds
+    # time_stamp_original_signal = [ t/sampling_frequency for t in range(ppg_df.shape[0]) ] # time in seconds
 
     # plot the original signal
     # plot_signal(time_stamp_original_signal , ppg_data, "Samples", "PPG Signal" , "Original Signal")
@@ -38,8 +35,8 @@ def segmentator(filtered_csv_path , segmented_csv_path):
     # calculate some values
     signal_len = ppg_df.shape[0]
     print(f"Signal Len = {signal_len}")
-    stride_samples = stride_len_sec * sampling_freq
-    samples_per_window = int(window_len_sec * sampling_freq)
+    stride_samples = shift_len_seconds * sampling_frequency
+    samples_per_window = int(window_len_seconds * sampling_frequency)
     num_segments = ( signal_len -  samples_per_window + stride_samples ) / stride_samples
     print(f"\nNumber of segments = {num_segments}")
 
@@ -56,7 +53,7 @@ def segmentator(filtered_csv_path , segmented_csv_path):
     if save:
         segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
 
-csv_list = os.listdir(filtered_folder)
+csv_list = os.listdir(input_folder)
 
 for csv_file in csv_list:
-    segmentator(f"{filtered_folder}//{csv_file}" , f"{segmented_folder}//{csv_file}")
+    segmentator(f"{input_folder}//{csv_file}" , f"{output_folder}//{csv_file}")

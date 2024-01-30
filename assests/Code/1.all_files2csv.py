@@ -5,8 +5,10 @@ It also extracts PPG data from BIDMC and MIMIC PERForm AF dataset and stores it 
 All the csv files generated is passed to a common directory.
 It also drops any NaN value in any of the csv files
 '''
+import imported_files.paths_n_vars as pNv
 
-csv_path = 'Csv_data\\'
+output_folder = pNv.csv_data_fol
+
 #MIMIC
 mimic_path = '..\\Mixed_dataset\\MIMIC'
 mimic_10Min = '..\\Mixed_dataset\\MIMIC_10MIn_125Hz'
@@ -27,6 +29,7 @@ import os
 import wfdb
 import datatable as dt
 import pandas as pd
+from pprint import pprint
 from imported_files.upsample_DaLiA import DaLiA
 
 def dat_to_csv(record_name, output_csv_path):
@@ -46,15 +49,15 @@ def dat_to_csv(record_name, output_csv_path):
     # Save to CSV
     df.to_csv(output_csv_path, index=False)
      
-def mimic():
+async def mimic():
     # Get the list of all .dat and .hea files
     dir_list = os.listdir(mimic_path)
-    print(dir_list)
+    pprint(dir_list)
     print(len(dir_list))
 
-    for i in range(len(dir_list)):
-        if i%2 == 0:
-            dat_to_csv(f"{mimic_path}\\{dir_list[i][:-4]}", csv_path + dir_list[i][:-3] + "csv")
+    for file in dir_list:
+        if file.split(".")[-1] == "dat":
+            dat_to_csv(f"{mimic_path}\\{file[:-4]}", output_folder + "\\" + file[:-3] + "csv")
             
 def txt_2_csv(input_txt_path, output_csv_path):
     # Read the CSV file
@@ -63,14 +66,14 @@ def txt_2_csv(input_txt_path, output_csv_path):
     df = df.dropna()
     df.to_csv(output_csv_path, index=False)
     
-def mimic_10_min():
+async def mimic_10_min():
     # Get the list of all .dat and .hea files
     dir_list = os.listdir(mimic_10Min)
-    print(dir_list)
+    pprint(dir_list)
     print(len(dir_list))
     
     for csv in dir_list:    
-        txt_2_csv(f"{mimic_10Min}\\{csv}", csv_path + csv[:-3] + "csv")
+        txt_2_csv(f"{mimic_10Min}\\{csv}", output_folder + "\\" + csv[:-3] + "csv")
               
 def split_csv_columns(input_csv_path, csv_path):
     # Read the CSV file
@@ -84,11 +87,11 @@ def split_csv_columns(input_csv_path, csv_path):
         output_csv_path = csv_path + f"{column_name}.csv"
         column_data.to_csv(output_csv_path, index=False)
         
-def bidmc():
-    split_csv_columns(bidmc_csv_path, csv_path)
+async def bidmc():
+    split_csv_columns(bidmc_csv_path, output_folder)
     
-def csl():
-    split_csv_columns(csl_csv_path, csv_path)
+async def csl():
+    split_csv_columns(csl_csv_path, output_folder)
     
 def extract_ppg_col(input_csv_path, output_csv_path):
     # Read the CSV file
@@ -106,14 +109,14 @@ def extract_ppg_col(input_csv_path, output_csv_path):
     # Save the new DataFrame to a CSV file
     ppg_df.to_csv(output_csv_path, index=False)
     
-def mimic_perform_af():
+async def mimic_perform_af():
     dir_list = os.listdir(perform_dir)
-    print(dir_list)
+    pprint(dir_list)
     print(len(dir_list))
     # Filter only CSV files
     csv_files = [file for file in dir_list if file.lower().endswith('.csv')]
     for csv_input in csv_files:
-        output_csv_path = csv_path + f"{csv_input}"
+        output_csv_path = output_folder + "\\" + f"{csv_input}"
         extract_ppg_col(f"{perform_dir}\\{csv_input}", output_csv_path)
 
 

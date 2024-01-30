@@ -1,18 +1,19 @@
 '''
 Takes the 10min segments and then process them using a Band pass Butterworth filter
-and then puts all the files in a single folder specified by global variable "filtered_folder"
+and then puts all the files in a single folder specified by global variable "output_folder"
 '''
 
 #~~~~~~~ SOME VARIABLES TO CONSIDER BFORE RUNNING THE SCRIPT~~~~~~~~~~~~~
 # folder paths
-ten_sec_folder = "10min_csv_data"
-filtered_folder = "filtered_csv_data"
+import imported_files.paths_n_vars as pNv
+input_folder = pNv.ten_min_csv_fol
+output_folder = pNv.filtered_folder
 
 # filter specifications
 filter_order = 4
-sampling_freq = 125 # in Hertz
 lower_cutoff = 0.2
 higher_cutoff = 4
+sampling_freq = pNv.sampling_frequency # in Hertz
 
 # debug / enhancing the processing speed
 plot_sig = False # make this false if you don't want to see the original and filtered signal
@@ -57,20 +58,20 @@ def butterworth_bp_filter(data_file_path, order, fs, lowcut, highcut, filtered_d
         plt.plot(t, filtered_data, 'r-', linewidth = 2, label = 'Filtered Data')
         plt.xlabel('Time (s)')
         plt.ylabel('Amplitude')
-        plt.title(data_file_path[len(ten_sec_folder) - 1: ] + ": " + str(order) + ' Order Butterworth Bandpass Filter')
+        plt.title(data_file_path[len(input_folder) - 1: ] + ": " + str(order) + ' Order Butterworth Bandpass Filter')
         plt.legend()
         plt.grid(True)
         plt.show()
     
 # Get the list of all files and directories
-csv_list = os.listdir(ten_sec_folder)
+csv_list = os.listdir(input_folder)
 print(f"{csv_list}, {len(csv_list)}")
 
 for csv_file in csv_list:
-    butterworth_bp_filter(f"{ten_sec_folder}\\{csv_file}",
+    butterworth_bp_filter(f"{input_folder}\\{csv_file}",
                           filter_order, 
                           sampling_freq, 
                           lower_cutoff, 
                           higher_cutoff, 
-                          f"{filtered_folder}\\{csv_file}")
+                          f"{output_folder}\\{csv_file}")
 
