@@ -119,10 +119,15 @@ def mimic_perform_af():
         extract_ppg_col(f"{perform_dir}\\{csv_input}", output_csv_path)
 
 
-# #Uncomment this code for running this code
-# mimic()
-# mimic_10_min()
-# bidmc()
-# mimic_perform_af()
-# csl()
-# DaLiA(dalia_path)
+if __name__ == "__main__":
+    import time
+    s = time.perf_counter()
+    # # Uncomment this code for running this code
+    # mimic()
+    # mimic_10_min()
+    # bidmc()
+    # mimic_perform_af()
+    # csl()
+    # DaLiA(dalia_path)
+    elapsed = time.perf_counter() - s
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")
