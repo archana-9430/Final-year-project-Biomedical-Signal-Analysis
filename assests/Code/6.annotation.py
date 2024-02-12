@@ -70,6 +70,7 @@ pprint(f"{csv_list}, {len(csv_list)}")
 
 for csv_file in csv_list:
     if csv_file.split('.')[-1] == 'csv':
+        print(f"~~~~ File Name = {csv_file}")
         annotator(f"{input_folder}\\{csv_file}", 
                   f"{output_folder}\\{csv_file}"
                 )
