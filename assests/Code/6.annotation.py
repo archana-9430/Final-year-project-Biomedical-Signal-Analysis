@@ -8,7 +8,7 @@ output_folder = annotated_folder
 class_list = ["0" , "1" , "2"] # good segn = 0 , partly clean signal = 1 , corrupted = 2
 
 #for debugging only
-save_anno = False
+save_anno = True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,7 +70,7 @@ pprint(f"{csv_list}, {len(csv_list)}")
 
 for csv_file in csv_list:
     if csv_file.split('.')[-1] == 'csv':
-        print(f"~~~~ File Name = {csv_file}")
+        print(f"FILE NAME = {csv_file}")
         annotator(f"{input_folder}\\{csv_file}", 
                   f"{output_folder}\\{csv_file}"
                 )
