@@ -21,10 +21,3 @@ seg_len_patient = 600
 # seconds
 window_len_seconds = 10
 shift_len_seconds = 6
-
-import os
-def check_paths():
-    path_list = [csv_data_fol , ten_min_csv_fol, filtered_folder, segmented_folder, annotated_folder]
-    for file in path_list:
-        if not os.path.exists(file):
-            raise Exception
