@@ -24,7 +24,7 @@ def take_annotation(segment_num:int ,c_seg : list):# safe annotation accept
         temp = input("Segment-{} annot = ".format(segment_num))
         if temp in class_list:
             return int(temp)
-        elif temp == ';':
+        elif temp == ';': # input ';' if u want to replot the current segment
             plot_signal(range(len(c_seg)) , c_seg ,'b' , "Sample Number", "PPG Signal" , "AGAIN\nSegment {}".format(segment_num))
         else:
             print("\n!!Enter a valid number please!!\n")
