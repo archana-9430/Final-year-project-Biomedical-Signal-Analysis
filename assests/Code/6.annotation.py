@@ -8,27 +8,24 @@ output_folder = annotated_folder
 class_list = ["0" , "1" , "2"] # good segn = 0 , partly clean signal = 1 , corrupted = 2
 
 #for debugging only
-save_anno = True
+save_anno = False
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from imported_files.plot import plot_signal
+from pprint import pprint
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-def plot_signal(x : list ,y : list , x_label = None , y_label = None , title = None):
-    plt.grid(True)
-    plt.plot(x,y)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-    plt.show()
-    plt.close()
 
-def take_annotation(segment_num:int):# safe annotation accept
+def take_annotation(segment_num:int ,c_seg : list):# safe annotation accept
     while True:
         temp = input("Segment-{} annot = ".format(segment_num))
         if temp in class_list:
             return int(temp)
+        elif temp == ';':
+            plot_signal(range(len(c_seg)) , c_seg ,'b' , "Sample Number", "PPG Signal" , "AGAIN\nSegment {}".format(segment_num))
         else:
             print("\n!!Enter a valid number please!!\n")
 
@@ -48,10 +45,10 @@ def annotator(segmented_file_path , annotated_file_path):
         current_segment = ppg_df[f"Segment {i}"].to_list()
         
         # plot the signal
-        plot_signal(range(len(current_segment)) , current_segment , "Time(s)", "PPG Signal" , "Segment {}".format(i))
+        plot_signal(range(len(current_segment)) , current_segment ,'b' , "Sample Number", "PPG Signal" , "Segment {}".format(i))
 
         # ask for annotation
-        annot = take_annotation(i)
+        annot = take_annotation(i, current_segment)
 
         # save the annotation 
         current_segment.insert(0,annot)
@@ -67,11 +64,12 @@ def annotator(segmented_file_path , annotated_file_path):
 
 # Get the list of all files and directories
 csv_list = os.listdir(input_folder)
-print(f"{csv_list}, {len(csv_list)}")
+pprint(f"{csv_list}, {len(csv_list)}")
 # for csv_file in csv_list:
 #     print(f"{segmented_folder}\\{csv_file}")
 
 for csv_file in csv_list:
-    annotator(f"{input_folder}\\{csv_file}", 
-              f"{output_folder}\\{csv_file}"
-             )
+    if csv_file.split('.')[-1] == 'csv':
+        annotator(f"{input_folder}\\{csv_file}", 
+                  f"{output_folder}\\{csv_file}"
+                )

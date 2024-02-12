@@ -2,10 +2,15 @@ import matplotlib.pyplot as plt
 import sys
 
 def on_press(event):
-    print('press', event.key)
-    sys.stdout.flush()
+    # print('press', event.key)
     if event.key == 'escape':
         plt.close()
+
+    elif event.key == 'M' or 'm':
+        plt.get_current_fig_manager().window.state('zoomed')
+
+    else:
+        return
 
 
 def plot_signal(x : list ,y : list , type : str = 'b' , x_label = None , y_label = None , title = None):
