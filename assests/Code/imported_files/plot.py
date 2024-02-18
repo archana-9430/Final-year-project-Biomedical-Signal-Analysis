@@ -7,13 +7,12 @@ def on_press(event):
         plt.close()
 
     elif event.key == 'M' or 'm':
+        print("Zoom!!")
         plt.get_current_fig_manager().window.state('zoomed')
 
-    else:
-        return
 
 
-def plot_signal(x : list ,y : list , type : str = 'b' , x_label = None , y_label = None , title = None):
+def plot_signal_interactive(x : list ,y : list , type : str = 'b' , x_label = None , y_label = None , title = None):
 
     fig, ax = plt.subplots()
     fig.canvas.mpl_connect('key_press_event', on_press)
