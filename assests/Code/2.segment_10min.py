@@ -1,7 +1,8 @@
 '''This file should make all the csv file to contain 8min long datam i.e, it should have 60000 PPG signal values.'''
 
-csv_data_fol = "Csv_data"
-ten_min_csv_fol = "10min_csv_data"
+import imported_files.paths_n_vars as pNv
+input_fol = pNv.csv_data_fol
+output_fol = pNv.ten_min_csv_fol
 
 '''
 The script takes csv files from "Csv_data" folder and then makes the signal of 10 min 
@@ -10,10 +11,10 @@ For that purpose it assumes sampling frequency as specified in the variable "sam
 '''
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
-sampling_freq = 125 # sampling freq in HERTZ
+sampling_freq = pNv.sampling_frequency # sampling freq in HERTZ
 
-window_len_sec = 10*60 # in seconds
-stride_len_sec = window_len_sec
+segment_len_sec = pNv.seg_len_patient # in seconds
+shift_len_sec = segment_len_sec
 
 # debug only...
 save = True
@@ -38,21 +39,21 @@ def plot_signal(fig_num:int, x : list ,y : list , x_label:str = None , y_label:s
 
 def check_n_uniform():
     # extract the names of all files in the given folder
-    file_list = os.listdir(csv_data_fol)
+    file_list = os.listdir(input_fol)
 
     for csv in file_list:
-        csv_path = f"{csv_data_fol}\\{csv}"
+        csv_path = f"{input_fol}\\{csv}"
         # open each one by one
         data_dt = dt.fread(csv_path)
         data_file = data_dt.to_pandas()
         data = data_file.dropna()
-        if(data.shape[0] > sampling_freq * window_len_sec + 1):
+        if(data.shape[0] > sampling_freq * segment_len_sec + 1):
             # over 10 min length 
-            uniformer(data , f"{ten_min_csv_fol}\\{csv}")
+            uniformer(data , f"{output_fol}\\{csv}")
         else:
             # already 10 min length or less so simply save them
             if save:
-                data.to_csv(path_or_buf = f"{ten_min_csv_fol}\\{csv}" , index = False)
+                data.to_csv(path_or_buf = f"{output_fol}\\{csv}" , index = False)
 
 
 def uniformer(ppg_df:pd.DataFrame , save_path:str) -> None:
@@ -61,8 +62,8 @@ def uniformer(ppg_df:pd.DataFrame , save_path:str) -> None:
     signal_len = len(ppg_df)
     print(f"\nFile name = {save_path}")
     print(f"Signal Len = {signal_len}")
-    stride_samples = stride_len_sec * sampling_freq
-    samples_per_window = int(window_len_sec * sampling_freq) + 1
+    stride_samples = shift_len_sec * sampling_freq
+    samples_per_window = int(segment_len_sec * sampling_freq) + 1
 
     # calculate number of overlapping segments
     num_segments = ( signal_len -  samples_per_window + stride_samples ) / stride_samples
@@ -110,4 +111,4 @@ def plot_csv(csv_path:str):
         plot_csv_data(f"{csv_path}\\{csv_file}", fig_num)
 
 # check_n_uniform()
-plot_csv(ten_min_csv_fol)
+plot_csv(output_fol)

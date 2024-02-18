@@ -5,7 +5,7 @@ import datatable as dt
 from numpy.fft import fft , fftshift , fftfreq
 import os
 
-ten_min_csv_fol = "10min_csv_data"
+csv_fol = "10sec_segmented_data"
 sampling_freq = 125
 noise_cutoff = 20
 
@@ -25,9 +25,9 @@ def snr(data : ndarray , fSamp : float , csv_path : str = None):
     noise_cut_samples = int(len_fft * (noise_cutoff / fSamp ))
 
     # # for plotting
-    # freq_list = [ f * fSamp/len_fft for f in range(len_fft) ]
-    # plot_signal( range(len_fft) , data , None , None , f"{csv_path}")
-    # plot_signal( freq_list , abs(data_fft) , None , None , f"FFT of {csv_path}")
+    freq_list = [ f * fSamp/len_fft for f in range(len_fft) ]
+    plot_signal( range(len_fft) , data , None , None , f"{csv_path}")
+    plot_signal( freq_list , abs(data_fft) , None , None , f"FFT of {csv_path}")
 
     # according to Nyquist the maximum frequency is sampling frequency / 2 
     # max_freq = sampling_frequency / 2
@@ -67,4 +67,4 @@ def print_snr(folder_path : str ,
     if print_results:
         pprint(snr)
 
-# print_snr(ten_min_csv_fol)
+print_snr(csv_fol)

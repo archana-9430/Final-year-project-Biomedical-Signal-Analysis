@@ -7,21 +7,22 @@ Also upsamples the 32 Hz accelerometer signals to 125Hz
 It also outputs a txt file (named "processed_files.txt") which have a list of csv files processed
 by the script in "report_folder"
 '''
-
-csv_path = 'Csv_data'
-csv_noise_path = "Csv_noise_DaLiA"
-report_folder = "Code"
+from imported_files.paths_n_vars import csv_data_fol , csv_noise_fol
+output_folder = csv_data_fol
+output_noise_folder = csv_noise_fol
+report_folder = ""
 
 # sampling frequencies in Hz
 original_acc_samp_freq = 32
 original_samp_freq = 64
-target_samp_freq =125
+target_samp_freq = 125
 
 # libraries
 import matplotlib.pyplot as plt
 from scipy.signal import resample
 import datatable as dt
 import pandas as pd
+from pprint import pprint
 import numpy as np
 import os
 
@@ -71,25 +72,21 @@ def recursive(object_path , entry_name):
 
         if entry.is_file() and len(entry.name.split('.')) > 1:
             if  entry.name == "BVP.csv":
-                BVP_upsample(f"{object_path}\\{entry.name}" , f"{csv_path}\\{entry_name}_125Hz.csv")
+                BVP_upsample(f"{object_path}\\{entry.name}" , f"{output_folder}\\{entry_name}_125Hz.csv")
             
             if entry.name == "ACC.csv":
-                ACC_upsample(f"{object_path}\\{entry.name}" , f"{csv_noise_path}\\{entry_name}_Noise_125Hz.csv")
+                ACC_upsample(f"{object_path}\\{entry.name}" , f"{output_noise_folder}\\{entry_name}_Noise_125Hz.csv")
 
         elif entry.is_dir():
             recursive(f"{object_path}\\{entry.name}" , f"{entry.name}")
 
 def write_csv_names():
     string_data = list_to_string(processed_files)
-    print(string_data)
+    pprint(string_data)
     csv_txt_path = f"{report_folder}\\processed_files.txt"
 
-    if os.path.exists(csv_txt_path):
-        with open(csv_txt_path , mode = "w") as txt_file:
-            txt_file.write(string_data)
-    else:   
-        with open(csv_txt_path , mode = "x") as txt_file:
-            txt_file.write(string_data)
+    with open(csv_txt_path , mode = "a") as txt_file:
+        txt_file.write(string_data)
 
 # code
             
