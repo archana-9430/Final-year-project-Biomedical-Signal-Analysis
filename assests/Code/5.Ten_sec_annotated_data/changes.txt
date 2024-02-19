@@ -1,0 +1,13 @@
+patient_29 segment 15 -> make it 1
+patient_30 segment 19 -> make it 2
+patient_30 segment 61 -> make it 0
+patient_31 segment 40 -> make it 2
+patient_31 segment 60 -> make it 0
+patient_36 segment 48 -> make it 0
+patient_38 segment 14 -> make it 2
+patient_39 segment 88 -> make it 1
+patient_41 segment 72 -> make it 2
+patient_42 segment 57 -> make it 1
+patient_45 segment 64 -> make it 1
+patient_47 segment 9 -> make it 0
+patient_48 segment 95 -> make it 0
