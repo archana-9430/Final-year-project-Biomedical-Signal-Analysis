@@ -13,7 +13,7 @@ def on_press(event):
 
 
 
-def plot_signal_interactive(x : list ,y : list , style : str = 'b' , x_label = None , y_label = None , title = None):
+def plot_signal_interactive(x : range|list , y : list , style : str = 'b' , x_label = "" , y_label = "" , title = ""):
 
     fig, ax = plt.subplots()
     fig.canvas.mpl_connect('key_press_event', on_press)

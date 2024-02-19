@@ -12,14 +12,18 @@ save_anno = True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from imported_files.plot import plot_signal_interactive
+import os
 from pprint import pprint
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
+from imported_files.plot import plot_signal_interactive
+
 
 
 def take_annotation(segment_num:int ,c_seg : list):# safe annotation accept
+    # plot the signal
+    plot_signal_interactive(range(len(c_seg)) , c_seg ,'b' , "Sample Number", "PPG Signal" , "Segment {}".format(segment_num))
+
     while True:
         temp = input("Segment-{} annot = ".format(segment_num))
         if temp in class_list:
@@ -34,7 +38,7 @@ def annotator(segmented_file_path , annotated_file_path):
     ppg_df = pd.read_csv(segmented_file_path)
 
     # annotation starts
-    print("\n~~~~~ANNOTATION Starts~~~~~~\n")
+    print("~~~~~ANNOTATION Starts~~~~~~\n")
     print("Good Signal = Class 0\nPartly Clean Signal = Class 1\nCorrupted Signal = Class 2")
 
     num_segments = ppg_df.shape[1]
@@ -43,9 +47,6 @@ def annotator(segmented_file_path , annotated_file_path):
     for i in range(1 , num_segments + 1):
         # take out the segment from the total signal
         current_segment = ppg_df[f"Segment {i}"].to_list()
-        
-        # plot the signal
-        plot_signal_interactive(range(len(current_segment)) , current_segment ,'b' , "Sample Number", "PPG Signal" , "Segment {}".format(i))
 
         # ask for annotation
         annot = take_annotation(i, current_segment)
@@ -55,10 +56,10 @@ def annotator(segmented_file_path , annotated_file_path):
         annotation_df["Segment {}".format(i)] = current_segment
         
         # save on each annotation
-        if(save_anno == True):
+        if(save_anno is True):
             annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) # save on each segment
 
-    if(save_anno == True):
+    if(save_anno is True):
         annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
 
 
@@ -70,7 +71,7 @@ pprint(f"{csv_list}, {len(csv_list)}")
 
 for csv_file in csv_list:
     if csv_file.split('.')[-1] == 'csv':
-        print(f"FILE NAME = {csv_file}")
+        print(f"\nFILE NAME = {csv_file}")
         annotator(f"{input_folder}\\{csv_file}", 
                   f"{output_folder}\\{csv_file}"
                 )
