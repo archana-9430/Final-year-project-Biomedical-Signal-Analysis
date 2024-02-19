@@ -12,7 +12,7 @@ save_anno = True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from imported_files.plot import plot_signal
+from imported_files.plot import plot_signal_interactive
 from pprint import pprint
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ def take_annotation(segment_num:int ,c_seg : list):# safe annotation accept
         if temp in class_list:
             return int(temp)
         elif temp == ';': # input ';' if u want to replot the current segment
-            plot_signal(range(len(c_seg)) , c_seg ,'b' , "Sample Number", "PPG Signal" , "AGAIN\nSegment {}".format(segment_num))
+            plot_signal_interactive(range(len(c_seg)) , c_seg ,'b' , "Sample Number", "PPG Signal" , "AGAIN\nSegment {}".format(segment_num))
         else:
             print("\n!!Enter a valid number please!!\n")
 
@@ -45,7 +45,7 @@ def annotator(segmented_file_path , annotated_file_path):
         current_segment = ppg_df[f"Segment {i}"].to_list()
         
         # plot the signal
-        plot_signal(range(len(current_segment)) , current_segment ,'b' , "Sample Number", "PPG Signal" , "Segment {}".format(i))
+        plot_signal_interactive(range(len(current_segment)) , current_segment ,'b' , "Sample Number", "PPG Signal" , "Segment {}".format(i))
 
         # ask for annotation
         annot = take_annotation(i, current_segment)
