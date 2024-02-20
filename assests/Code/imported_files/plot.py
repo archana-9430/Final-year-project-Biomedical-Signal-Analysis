@@ -1,20 +1,26 @@
-import sys
+'''
+Provides customised interactive matplotlib functionality for annotation
+'''
 import matplotlib.pyplot as plt
 
-
 def on_press(event):
+    '''
+    Callback function to handle keypress events
+    '''
     # print('press', event.key)
     if event.key == 'escape':
         plt.close()
 
-    elif event.key == 'M' or 'm':
+    elif event.key == 'space':
         # print("Zoom!!")
         plt.get_current_fig_manager().window.state('zoomed')
 
 
 
-def plot_signal_interactive(x : range|list , y : list , style : str = 'b' , x_label = "" , y_label = "" , title = ""):
-
+def plot_signal_interactive(x : range|list , y : list , style : str = 'b' , x_label : str = "" , y_label : str = "" , title : str = ""):
+    '''
+    Function plots 2D graphs with limited interactive functionalities
+    '''
     fig, ax = plt.subplots()
     fig.canvas.mpl_connect('key_press_event', on_press)
     ax.plot(x , y , style)
