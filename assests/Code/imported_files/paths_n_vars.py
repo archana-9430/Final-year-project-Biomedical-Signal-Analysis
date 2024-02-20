@@ -9,6 +9,10 @@ ten_min_csv_fol = "2.10min_csv_data"
 filtered_folder = "3.filtered_csv_data"
 segmented_folder = "4.Ten_sec_segmented_data"
 annotated_folder = "5.Ten_sec_annotated_data"
+inter_folder = "Inter"
+intra_folder = "Intra"
+inter_train = "Inter\\Train"
+inter_test = "Inter\\Test"
 
 # variables
 sampling_frequency = 125 # in Hertz
