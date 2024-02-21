@@ -31,16 +31,16 @@ def interquartile_range(segment):
 def statistical(segment):
     features = {}
     #Time domain:
-    features['mean'] = np.mean(segment)
-    features['population_std'] = np.std(segment, dtype = np.float32)
-    features['sample_std'] = np.std(segment, dtype = np.float32,  ddof=1)
-    features['rms'] = rms(segment)
+    # features['mean'] = np.mean(segment)
+    # features['population_std'] = np.std(segment, dtype = np.float32)
+    # features['sample_std'] = np.std(segment, dtype = np.float32,  ddof=1)
+    # features['rms'] = rms(segment)
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
-    features['interquartile_range'] = interquartile_range(segment)
+    # features['interquartile_range'] = interquartile_range(segment)
     
-    features['Shannon entropy'] = shannon_entropy(segment)
-    features['sample_entropy'] = sample_entropy(segment)
+    # features['Shannon entropy'] = shannon_entropy(segment)
+    # features['sample_entropy'] = sample_entropy(segment)
 
     #Frequency domain
     

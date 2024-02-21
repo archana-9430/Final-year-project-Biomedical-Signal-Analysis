@@ -16,6 +16,7 @@ inter_test = "Test"
 features_folder = "6.Features_extracted"
 inter_test_file = "Inter\Test\combined_annotated_test.csv"
 inter_train_file = "Inter\Train\combined_annotated_train.csv"
+features_file = "6.Features_extracted\\features.csv"
 
 # variables
 sampling_frequency = 125 # in Hertz
