@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import inter_train_file, inter_test_file, features_file
+from imported_files.paths_n_vars import inter_train_file, inter_test_file, inter_annotated_file, features_file
 from imported_files.statistical_feature import statistical
 
 import pandas as pd
@@ -16,4 +16,4 @@ def store_features(features_file, input_train_file):
     
     print(features_df)
 
-store_features(features_file, inter_train_file)
+store_features(features_file, inter_annotated_file)
