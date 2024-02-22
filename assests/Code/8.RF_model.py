@@ -1,18 +1,15 @@
-from imported_files.paths_n_vars import features_file, inter_annotated_file
-
-# annotated_csv_path = "code\BIDMC\Annotated_125Hz\\bidmc03m.csv"
-# features_file_path = "code\BIDMC\\features_125Hz\\bidmc03m.csv"
+from imported_files.paths_n_vars import features_file, intra_annotated_file
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 5
+num_trees = 50
 split_criteria = "gini"
 
 # k of k flod cross validation
-k = 4 # change if you want to experiment
+k = 5 # change if you want to experiment
 
 # class list
-class_list = ["1" , "2"] # good segn = 1 , corrupted signal = 2
+class_list = ["0" , "1"] # good segn = 0 , corrupted signal = 1
 
 # ~~~~~~~LIBRARIES~~~~~~~
 import pandas as pd
@@ -88,5 +85,5 @@ def RF_model(annotated_file , features_file):
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf)
 
-RF_model(inter_annotated_file , features_file)
+RF_model(intra_annotated_file , features_file)
 
