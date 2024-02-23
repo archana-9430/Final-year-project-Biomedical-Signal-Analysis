@@ -3,6 +3,7 @@ import numpy as np
 import EntropyHub as EH
 
 from scipy.stats import entropy, skew, kurtosis
+import scipy.signal as signal
 
 def shannon_entropy(segment):
     # Calculate the probability distribution
@@ -12,8 +13,22 @@ def shannon_entropy(segment):
     
     # Compute the Shannon entropy
     H = entropy(p_normalized, base=2)
-    
     return H
+
+def mean_psd(segment, fs):
+    f, psd = signal.welch(segment, fs=fs)
+    '''Welch's method: Divide the signal into overlapping segments,
+    computing the Fourier transform of each segment,
+    and averaging the squared magnitudes of the resulting spectra to obtain the PSD estimate.
+    '''
+    # mean_psd = np.mean(psd)
+    std_psd = np.std(psd)
+    #accessing the maximum frequency from the index of the maximum power value in the PSD array
+    dominant_frequency = f[np.argmax(psd)]
+     # Calculate spectral entropy
+    normalized_psd = psd / np.sum(psd)  # Normalize PSD
+    spectral_entropy = -np.sum(normalized_psd * np.log2(normalized_psd))
+    return std_psd, dominant_frequency, spectral_entropy
 
 def sample_entropy(segment):
     Samp, _ = EH.SampEn(segment, m = 4)
@@ -43,5 +58,6 @@ def statistical(segment):
     # features['sample_entropy'] = sample_entropy(segment)
 
     #Frequency domain
+    features['std_psd'], features['dominant_freq'], features['spectral_entropy'] = mean_psd(segment, 125)
     
     return features

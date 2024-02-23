@@ -1,8 +1,7 @@
-from imported_files.paths_n_vars import inter_train_file, inter_test_file, inter_annotated_file, features_file
+from imported_files.paths_n_vars import inter_train_file, inter_test_file, intra_annotated_file, features_file
 from imported_files.statistical_feature import statistical
 
 import pandas as pd
-import os
 import numpy as np
 from scipy.stats import entropy, skew, kurtosis
 
@@ -16,4 +15,4 @@ def store_features(features_file, input_train_file):
     
     print(features_df)
 
-store_features(features_file, inter_annotated_file)
+store_features(features_file, intra_annotated_file)
