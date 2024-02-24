@@ -25,7 +25,7 @@ for i in range(1, 11):
     kmeans.fit(X)
     wcss.append(kmeans.inertia_)
 
-plt.plot(range(1, 11), wcss)
+plt.plot(range(len(wcss)), wcss)
 plt.title('Elbow Method')
 plt.xlabel('Number of clusters')
 plt.ylabel('WCSS')

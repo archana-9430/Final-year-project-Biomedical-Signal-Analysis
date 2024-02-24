@@ -3,15 +3,14 @@ from imported_files.statistical_feature import statistical
 
 import pandas as pd
 import numpy as np
-from scipy.stats import entropy, skew, kurtosis
 
-
-def store_features(features_file, input_train_file):
+def store_features(local_features_file, input_train_file):
     df = pd.read_csv(input_train_file, skiprows=2, header=None) 
-    extracted_features = {col: statistical(df[col]) for col in df}
+
+    extracted_features = {col: statistical(df[col].values) for col in df}
     features_df = pd.DataFrame(extracted_features)
     features_df = features_df.T
-    features_df.to_csv(features_file, index = False)
+    features_df.to_csv(local_features_file, index = False)
     
     print(features_df)
 
