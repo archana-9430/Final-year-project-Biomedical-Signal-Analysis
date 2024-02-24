@@ -37,8 +37,8 @@ kmeans.fit(X)
 cluster_centers = kmeans.cluster_centers_
 
 #Euclidean distances from cluster centers
-distances = pairwise_distances(X, cluster_centers)
-print("Euclidean Distances from Cluster Centers: ")
+distances = pairwise_distances(cluster_centers, cluster_centers)
+print("Euclidean Distances of each Cluster Centers: ")
 print(distances)
 features_df = pd.DataFrame(distances)
 features_df = features_df.T
