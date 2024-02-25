@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import inter_train_file, inter_test_file, intra_annotated_file, features_file
+from imported_files.paths_n_vars import inter_train_file, inter_test_file, intra_annotated_file, features_file , ae_features_file , all_features_file
 from imported_files.statistical_feature import statistical
 
 import pandas as pd
@@ -14,4 +14,16 @@ def store_features(local_features_file, input_train_file):
     
     print(features_df)
 
+
+def merge_all_features(_features_file , _ae_features_file , _all_features_file):
+    '''
+    Merges all the features into a single csv file
+    '''
+    features_df = pd.read_csv(_features_file)
+    AE_features = pd.read_csv(_ae_features_file)
+    all_features_df = pd.concat([features_df , AE_features] , axis = 1)
+    print(all_features_df)
+    all_features_df.to_csv(_all_features_file , index=False)
+
 store_features(features_file, intra_annotated_file)
+merge_all_features(features_file , ae_features_file , all_features_file)
