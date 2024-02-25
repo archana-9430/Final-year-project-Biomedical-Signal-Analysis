@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import nolds
+# import nolds
 
 from scipy.stats import entropy, skew, kurtosis
 import scipy.signal as signal
@@ -30,18 +30,22 @@ def permutation_entropy(data, order, num_levels):
     patterns = [tuple(symbols[i:i+order]) for i in range(len(symbols) - order + 1)]
     _, counts = np.unique(patterns, return_counts=True, axis=0)
     probabilities = counts / len(patterns)
-    entropy = -np.sum(probabilities * np.log2(probabilities))
-    return entropy
+    entropy_val = -np.sum(probabilities * np.log2(probabilities))
+    return entropy_val
 
 def svd_entropy(data):
     # Convert pandas Series to numpy array
     # data_array = data.values
-    data_array = data.values.reshape(-1, 1)
-    _, s, _ = np.linalg.svd(data_array)
+    data_array = data.reshape(-1, 1)
+    # print(f"svd_entropy :: data_array {data_array}")
+    # print(f"svd_entropy :: data_array shape {data_array.shape}")
+    s = np.linalg.svd(data_array ,  compute_uv = False)
+    # print(f"svd_entropy :: s {s}")
     norm_s = s / np.sum(s)
-    entropy = -np.sum(norm_s * np.log(norm_s))
+    entropy_val = -np.sum(norm_s * np.log(norm_s))
+    # print(f"svd_entropy :: norm_s  {norm_s }\n")
     
-    return entropy
+    return entropy_val
 
 def first_derivative_std(signal):
     first_derivative = np.gradient(signal)
@@ -67,7 +71,7 @@ def rms(segment):
     return rms
 
 def interquartile_range(segment):
-    q3, q1 = np.percentile(segment, [75 ,25])
+    q3, q1 = np.percentile(segment , [75 ,25])
     return (q3 - q1)
  
  
@@ -106,7 +110,11 @@ def fourier_kurtosis(signal):
     kurt = kurtosis(magnitude_spectrum)
     return kurt
 
-def statistical(segment):
+def statistical(segment : np.ndarray):
+    '''
+    Ensure the argument is a numpy array
+    '''
+
     features = {}
     #Time domain:
     # print(type(segment))
