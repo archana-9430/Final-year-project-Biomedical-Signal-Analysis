@@ -14,7 +14,6 @@ def store_features(local_features_file, input_train_file):
     
     print(features_df)
 
-
 def merge_all_features(_features_file , _ae_features_file , _all_features_file):
     '''
     Merges all the features into a single csv file
