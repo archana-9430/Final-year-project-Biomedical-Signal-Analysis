@@ -30,7 +30,7 @@ def add_annotation(annotation_file, feature_file):
     '''
     annotation_row = pd.read_csv(annotation_file, skiprows=1, nrows=1, header=None)
     target_df = pd.read_csv(feature_file)
-    target_df.insert(0, 'annotation', annotation_row.T.values)
+    target_df.insert(0, 'annotation', annotation_row.iloc[0])
     target_df.to_csv(feature_file, index=False)
 
 store_features(features_file, intra_annotated_file)
