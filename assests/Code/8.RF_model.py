@@ -2,7 +2,7 @@ from imported_files.paths_n_vars import features_file, intra_annotated_file, all
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 50
+num_trees = 10
 split_criteria = "entropy"
 
 # k of k flod cross validation
@@ -29,7 +29,11 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 import seaborn as sns # seaborn for additional functionality such as heat map
 
+# additionals
 from sklearn.metrics import classification_report
+
+# to calculate number of instances of 0 and 1
+from collections import Counter
 # ~~~~~~~~~~~~END LIBRARIES~~~~~~~~~~~~~~~~~~~~~
 
 def create_train_classifier(x_train_data , y_train_data):
@@ -86,8 +90,10 @@ def rf_model( local_features_file, annotated_file : str = ""  , description : st
     # split the dataset using test_train_split() function
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
 
-    print(f"y_train :: \n{y_train}")
-    print(f"y_test :: \n{y_test}")
+    num_instances_train = dict(Counter(y_train))
+    num_instances_test = dict(Counter(y_test))
+    print(f"Train instances : {num_instances_train}")
+    print(f"Test instances : {num_instances_test}")
     clf = create_train_classifier(x_train , y_train)
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf , description)
