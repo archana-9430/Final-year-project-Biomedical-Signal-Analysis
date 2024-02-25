@@ -1,11 +1,24 @@
 import pandas as pd
 import numpy as np
+import math
 # import nolds
-
+NAN_SUBSTITUTE = 0
 from scipy.stats import entropy, skew, kurtosis
-import scipy.signal as signal
+from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
+
+# decorator for chacking for nan return values
+import functools
+def nan_check(function):
+    @functools.wraps(function)
+    def nan_check_wrapper(*arg , **kwargs):
+        function_output = function(*arg , **kwargs)
+        assert not np.any(pd.isna(function_output)) , f"ERROR::{function.__name__} returns nan at seg {i%16}"
+     
+        return function_output
+    
+    return nan_check_wrapper
 
 #TIME DOMAIN
 def shannon_entropy(segment):
@@ -80,12 +93,15 @@ def extract_rr_intervals(ppg_segment, sampling_rate):
     # Compute the time differences between consecutive peaks to obtain RR intervals
     rr_intervals = np.diff(peaks) / sampling_rate
     return rr_intervals   
+
 # RMSSD (Root Mean Square of Successive Differences) is a measure of heart rate variability
 def rmssd(segment):
     rr_intervals = extract_rr_intervals(segment, 125)
     successive_diff = np.diff(rr_intervals)
     squared_diff = successive_diff ** 2
     mean_squared_diff = np.mean(squared_diff)
+    if np.isnan(mean_squared_diff):
+        mean_squared_diff = NAN_SUBSTITUTE
     rmssd_value = np.sqrt(mean_squared_diff)
     return rmssd_value
     

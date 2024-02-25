@@ -82,6 +82,7 @@ def rf_model( local_features_file, annotated_file : str = ""  , description : st
         labels = features['annotation']
         features.drop(['annotation'] , axis = 1)
     
+    assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
     # split the dataset using test_train_split() function
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
 
