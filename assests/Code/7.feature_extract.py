@@ -10,8 +10,8 @@ def store_features(local_features_file, input_train_file):
     extracted_features = {col: statistical(df[col].values) for col in df}
     features_df = pd.DataFrame(extracted_features)
     features_df = features_df.T
+    assert not np.any(np.isnan(features_df)) , f"ERROR::"
     features_df.to_csv(local_features_file, index = False)
-    
     print(features_df)
 
 def merge_all_features(_features_file , _ae_features_file , _all_features_file):
