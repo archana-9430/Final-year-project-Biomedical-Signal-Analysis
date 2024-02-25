@@ -1,10 +1,24 @@
 import pandas as pd
 import numpy as np
-import nolds
+# import nolds
 
 from scipy.stats import entropy, skew, kurtosis
-import scipy.signal as signal
+from scipy import signal
 
+import time
+import functools
+def timeit(function):
+    @functools.wraps(function)
+    def wrapper_timeit(*arg , **kwargs):
+        
+        start = time.perf_counter()
+        function_output = function(*arg , **kwargs)
+        end = time.perf_counter()
+        print(f"{function.__name__} took : {end - start : 0.6f} seconds")
+        
+        return function_output
+    
+    return wrapper_timeit
 
 def shannon_entropy(segment):
     # Calculate the probability distribution
@@ -28,18 +42,22 @@ def permutation_entropy(data, order, num_levels):
     patterns = [tuple(symbols[i:i+order]) for i in range(len(symbols) - order + 1)]
     _, counts = np.unique(patterns, return_counts=True, axis=0)
     probabilities = counts / len(patterns)
-    entropy = -np.sum(probabilities * np.log2(probabilities))
-    return entropy
+    entropy_val = -np.sum(probabilities * np.log2(probabilities))
+    return entropy_val
 
 def svd_entropy(data):
     # Convert pandas Series to numpy array
     # data_array = data.values
-    data_array = data.values.reshape(-1, 1)
-    _, s, _ = np.linalg.svd(data_array)
+    data_array = data.reshape(-1, 1)
+    # print(f"svd_entropy :: data_array {data_array}")
+    # print(f"svd_entropy :: data_array shape {data_array.shape}")
+    s = np.linalg.svd(data_array ,  compute_uv = False)
+    # print(f"svd_entropy :: s {s}")
     norm_s = s / np.sum(s)
-    entropy = -np.sum(norm_s * np.log(norm_s))
+    entropy_val = -np.sum(norm_s * np.log(norm_s))
+    # print(f"svd_entropy :: norm_s  {norm_s }\n")
     
-    return entropy
+    return entropy_val
 
 def mean_psd(segment, fs):
     f, psd = signal.welch(segment, fs=fs)
@@ -56,17 +74,20 @@ def mean_psd(segment, fs):
     spectral_entropy = -np.sum(normalized_psd * np.log2(normalized_psd))
     return std_psd, dominant_frequency, spectral_entropy
 
-    
 def rms(segment):
     rms = np.sqrt(np.mean(segment**2))
     return rms
 
 def interquartile_range(segment):
-    q3, q1 = np.percentile(segment, [75 ,25])
+    q3, q1 = np.percentile(segment , [75 ,25])
     return (q3 - q1)
     
 
-def statistical(segment):
+def statistical(segment : np.ndarray):
+    '''
+    Ensure the argument is a numpy array
+    '''
+
     features = {}
     #Time domain:
     # print(type(segment))
@@ -82,7 +103,7 @@ def statistical(segment):
     
     features['interquartile_range'] = interquartile_range(segment)
     
-    features['Shannon entropy'] = shannon_entropy(segment)
+    features['shannon_entropy'] = shannon_entropy(segment)
 
 
     #Frequency domain
