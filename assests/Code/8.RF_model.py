@@ -86,4 +86,3 @@ def rf_model(annotated_file , _features_file):
     test_n_results(x_test , y_test , clf)
 
 rf_model(intra_annotated_file , features_file)
-
