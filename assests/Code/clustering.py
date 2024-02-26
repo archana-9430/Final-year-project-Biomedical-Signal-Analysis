@@ -50,10 +50,15 @@ features_df = pd.DataFrame(distances)
 features_df = features_df.T
 features_df.to_csv("cluster_euclidean_distances.csv", index = False)
 
-#Range of cluster centers along each feature dimension for each cluster
+#Range of cluster centers along each feature dimension for each cluster -> size == num of clusters
 cluster_ranges = []
 for cluster_center in cluster_centers:
     cluster_range = cluster_center.max() - cluster_center.min()
     cluster_ranges.append(cluster_range)
 cluster_ranges = np.array(cluster_ranges)
 print('Range of cluster centers along each feature dimension for each cluster: ', cluster_ranges)
+
+#Standard deviation of cluster centers along each feature dimension -> size == num of features
+cluster_centers_std = np.std(cluster_centers, axis=0)
+print("Standard deviation of cluster centers along each feature dimension:")
+print(cluster_centers_std)
