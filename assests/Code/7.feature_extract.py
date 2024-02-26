@@ -7,10 +7,10 @@ import numpy as np
 def store_features(local_features_file, input_train_file):
     df = pd.read_csv(input_train_file, skiprows=2, header=None) 
 
-    extracted_features = {col: statistical(df[col].values) for col in df}
+    extracted_features = {col: statistical(df[col].to_numpy(copy = True)) for col in df}
     features_df = pd.DataFrame(extracted_features)
     features_df = features_df.T
-    assert not np.any(np.isnan(features_df)) , f"ERROR::"
+    assert not np.any(np.isnan(features_df)) , "ERROR::STORE FEATURES::RETURNS NAN VALUES"
     features_df.to_csv(local_features_file, index = False)
     print(features_df)
 

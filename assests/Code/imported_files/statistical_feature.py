@@ -72,7 +72,7 @@ def zero_crossing_rate(signal):
         if (signal[i] >= 0 and signal[i - 1] < 0) or (signal[i] < 0 and signal[i - 1] >= 0):
             zero_crossings += 1
     # Return the zero crossing rate
-    return zero_crossings / (len(signal) - 1)    
+    return zero_crossings / (len(signal) - 1)   
 
 def mean_absolute_power(signal):
     abs_signal = np.abs(signal)
@@ -98,10 +98,12 @@ def extract_rr_intervals(ppg_segment, sampling_rate):
 def rmssd(segment):
     rr_intervals = extract_rr_intervals(segment, 125)
     successive_diff = np.diff(rr_intervals)
+
+    if len(successive_diff) == 0: # avoids nan output
+        successive_diff = NAN_SUBSTITUTE
+
     squared_diff = successive_diff ** 2
     mean_squared_diff = np.mean(squared_diff)
-    if np.isnan(mean_squared_diff):
-        mean_squared_diff = NAN_SUBSTITUTE
     rmssd_value = np.sqrt(mean_squared_diff)
     return rmssd_value
     
