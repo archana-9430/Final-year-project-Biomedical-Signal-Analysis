@@ -1,14 +1,15 @@
 '''cluster the segments of patients based on their annotations and
 then find the Euclidean distances from the cluster centers. '''
 
-from imported_files.paths_n_vars import intra_annotated_file, features_file
+from imported_files.paths_n_vars import features_file
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances
 
-# df = pd.read_csv(intra_annotated_file)
+# df = pd.read_csv(intra_annotated_file
 df = pd.read_csv(features_file)
 annotations = df.iloc[1].values
 
@@ -48,3 +49,11 @@ print(distances)
 features_df = pd.DataFrame(distances)
 features_df = features_df.T
 features_df.to_csv("cluster_euclidean_distances.csv", index = False)
+
+#Range of cluster centers along each feature dimension for each cluster
+cluster_ranges = []
+for cluster_center in cluster_centers:
+    cluster_range = cluster_center.max() - cluster_center.min()
+    cluster_ranges.append(cluster_range)
+cluster_ranges = np.array(cluster_ranges)
+print('Range of cluster centers along each feature dimension for each cluster: ', cluster_ranges)
