@@ -33,6 +33,11 @@ def add_annotation(annotation_file, feature_file):
     target_df.insert(0, 'annotation', annotation_row.iloc[0])
     target_df.to_csv(feature_file, index=False)
 
-store_features(features_file, intra_annotated_file)
-merge_all_features(features_file , ae_features_file , all_features_file)
+# store_features(features_file, intra_annotated_file)
+# merge_all_features(features_file , ae_features_file , all_features_file)
+# add_annotation(intra_annotated_file, all_features_file)
+
+# reannotation
+store_features(features_file[:-4] + '_filtered_1_1_10.csv', '5.Ten_sec_annotated_data/patient_0_1_10.csv')
+merge_all_features(features_file[:-4] + '_filtered_1_1_10.csv' , ae_features_file , all_features_file)
 add_annotation(intra_annotated_file, all_features_file)

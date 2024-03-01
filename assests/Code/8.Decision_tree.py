@@ -123,17 +123,12 @@ def test_n_results(x_test_data , y_test_data , classifier , x_train_data , descr
 
 def dt_model( local_features_file, annotated_file : str = ""  , description : str = ""):
     # get the dataset from the files
-    features = pd.DataFrame()
-    labels = pd.DataFrame()
-    if annotated_file == "":
-        features = pd.read_csv(local_features_file)
-        labels = features['annotation']
+    features = pd.read_csv(local_features_file)
+    labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
+
+    if local_features_file == all_features_file  and 'annotation' in features.columns:
         features.drop(['annotation'] , axis = 'columns' , inplace = True)
 
-    else:
-        features = pd.read_csv(local_features_file)
-        labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
-    
     assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
     # split the dataset using test_train_split() function
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
@@ -147,7 +142,13 @@ def dt_model( local_features_file, annotated_file : str = ""  , description : st
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf ,x_train ,  description)
 
-print("\n~~~~~ DECISION TREE:: W/O AE FEATURES ~~~~~")
-dt_model(features_file ,intra_annotated_file ,  "w/o AE features")
-print("\n~~~~~ DECISION TREE:: WITH ALL FEATURES ~~~~~")
-dt_model(all_features_file , description = "with all features")
+# print("\n~~~~~ DECISION TREE:: W/O AE FEATURES ~~~~~")
+# dt_model(features_file ,intra_annotated_file ,  "w/o AE features")
+# print("\n~~~~~ DECISION TREE:: WITH ALL FEATURES ~~~~~")
+# dt_model(all_features_file , description = "with all features")
+    
+#~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
+dt_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
+print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
+dt_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")

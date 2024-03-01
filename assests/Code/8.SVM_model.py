@@ -10,7 +10,7 @@ c = 2
 k = 9 # change if you want to experiment
 
 # class list
-class_list = ["0" , "1"] # good signal = 1 , corrupted signal = 2
+# class_list = ["0" , "1"] # good signal = 1 , corrupted signal = 2
 
 # ~~~~~~~LIBRARIES~~~~~~~
 import pandas as pd
@@ -72,16 +72,14 @@ def test_n_results(x_test_data , y_test_data , classifier , description:str = ""
     print("\nAvg score on test dataset = {}".format(classifier.score(x_test_data , y_test_data)))
     print(classifier)
 
-def svm_model(features_file, annotated_file : str = ""  , description : str = ""):
-    if annotated_file == "":
-        features = pd.read_csv(features_file)
-        labels = features['annotation']
-        features.drop(['annotation'] , axis = 'columns', inplace = True)
+def svm_model(local_features_file, annotated_file : str = ""  , description : str = ""):
+    # get the dataset from the files
+    features = pd.read_csv(local_features_file)
+    labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
 
-    else:
-        features = pd.read_csv(features_file)
-        labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
-    
+    if local_features_file == all_features_file and 'annotation' in features.columns :
+        features.drop(['annotation'] , axis = 'columns' , inplace = True)
+
     assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
 
     # split the dataset using test_train_split() function
@@ -98,8 +96,13 @@ def svm_model(features_file, annotated_file : str = ""  , description : str = ""
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf , description)
 
-print("\n~~~~~ SVM:: W/O AE FEATURES ~~~~~")
-svm_model(features_file , intra_annotated_file , description = "w/o AE features")
-print("\n~~~~~ SVM:: WITH ALL FEATURES ~~~~~")
-svm_model(all_features_file , description = "with all features")
+# print("\n~~~~~ SVM:: W/O AE FEATURES ~~~~~")
+# svm_model(features_file , intra_annotated_file , description = "w/o AE features")
+# print("\n~~~~~ SVM:: WITH ALL FEATURES ~~~~~")
+# svm_model(all_features_file , description = "with all features")
 
+#~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
+svm_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
+print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
+svm_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")

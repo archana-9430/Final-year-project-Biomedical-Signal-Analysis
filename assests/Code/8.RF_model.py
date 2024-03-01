@@ -1,12 +1,13 @@
-from imported_files.paths_n_vars import features_file, intra_annotated_file, all_features_file
+from imported_files.paths_n_vars import features_file, intra_annotated_file, all_features_file, ae_features_file
+# import features_scaler as fScaler
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 10
+num_trees = 15
 split_criteria = "entropy"
 
 # k of k flod cross validation
-k = 5 # change if you want to experiment
+k = 9 # change if you want to experiment
 
 # class list
 # class_list = ["0" , "1"] # good segn = 0 , corrupted signal = 1
@@ -47,7 +48,7 @@ def k_fold_s_crossval(x_train_data , y_train_data , k_value , classifier):
     rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
     result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf)
     print(result)
-    print("Avg accuracy on train set: {}".format(result.mean()))
+    print("Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
 
 
 def test_n_results(x_test_data , y_test_data , classifier , description:str = ""):
@@ -68,25 +69,20 @@ def test_n_results(x_test_data , y_test_data , classifier , description:str = ""
     plt.show()
 
     # classification report
+    print(f"Confu mtrx = \n{confusion_matrix}")
     print("\nClassification Report:\n")
     print(classification_report(y_test_data, test_pred_decision_tree))
     print("\nAvg score on test dataset = {}".format(classifier.score(x_test_data , y_test_data)))
     print(classifier)
 
-def rf_model( local_features_file, annotated_file : str = ""  , description : str = ""):
+def rf_model( local_features_file, annotated_file , description : str = ""):
     # get the dataset from the files
-    features = pd.DataFrame()
-    labels = pd.DataFrame()
-    if annotated_file == "":
-        features = pd.read_csv(local_features_file)
-        labels = features['annotation']
+    features = pd.read_csv(local_features_file)
+    labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
+
+    if local_features_file == all_features_file and 'annotation' in features.columns :
         features.drop(['annotation'] , axis = 'columns' , inplace = True)
 
-    else:
-        features = pd.read_csv(local_features_file)
-        labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
-        
-    
     assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
     # split the dataset using test_train_split() function
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
@@ -100,7 +96,18 @@ def rf_model( local_features_file, annotated_file : str = ""  , description : st
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf , description)
 
-print("\n~~~~~ RF:: W/O AE FEATURES ~~~~~")
-rf_model(features_file , intra_annotated_file , description = "w/o AE features")
-print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
-rf_model( all_features_file , description = "with all features")
+# print("\n~~~~~ RF:: W/O AE FEATURES ~~~~~")
+# rf_model(features_file , intra_annotated_file , description = "w/o AE features")
+
+    
+# print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
+# rf_model( all_features_file , intra_annotated_file , description = "with all features")
+
+# print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
+# rf_model( ae_features_file, intra_annotated_file , description = "with AE features only")
+
+#~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
+rf_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
+print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
+rf_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")

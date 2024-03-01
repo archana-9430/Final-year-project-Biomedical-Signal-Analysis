@@ -9,17 +9,17 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances
 
-# before re-annotation
-df = pd.read_csv(features_file)
-annotations = pd.read_csv(intra_annotated_file).iloc[0].values.astype('int')
-print(f'annotations = {annotations}')
+# # before re-annotation
+# df = pd.read_csv(features_file)
+# annotations = pd.read_csv(intra_annotated_file).iloc[0].values.astype('int')
+# print(f'annotations = {annotations}')
 
 # # Drop patient IDs and annotations
 # data = df.drop([0])
 
-# # after re-annotation
-# df = pd.read_csv(all_features_file)
-# annotations = pd.read_csv('5.Ten_sec_annotated_data/patient_0_1_10.csv').iloc[0].T.values.astype(int)
+# after re-annotation
+df = pd.read_csv(all_features_file)
+annotations = pd.read_csv('5.Ten_sec_annotated_data/patient_0_1_10.csv').iloc[0].T.values.astype(int)
 data = df
 
 
@@ -41,6 +41,7 @@ plt.plot(range(len(wcss)), wcss)
 plt.title('Elbow Method')
 plt.xlabel('Number of clusters')
 plt.ylabel('WCSS')
+plt.grid(True)
 plt.show()
 
 #Optimal number of clusters from the elbow method plot
@@ -97,5 +98,6 @@ for i in range(n_clusters):
                 clus_composition['0'] += 1
     composition[f'Cluster { i } '] = clus_composition
 
+print("Cluster Composition: ")
 from pprint import pprint
 pprint(composition)
