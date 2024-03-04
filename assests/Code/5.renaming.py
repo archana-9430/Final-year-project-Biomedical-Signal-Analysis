@@ -1,6 +1,10 @@
 from imported_files.paths_n_vars import ten_min_csv_fol
 # folder paths
-input_folder = ten_min_csv_fol
+# for filtered
+# input_folder = ten_min_csv_fol
+
+# for unfiltered
+input_folder = "4.Ten_sec_segmented_unfiltered"
 
 import os
 from pprint import pprint

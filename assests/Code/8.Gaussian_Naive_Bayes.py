@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import features_file, intra_annotated_file, all_features_file
+from imported_files.paths_n_vars import features_file, intra_annotated_file, all_features_file, ae_features_file
 
 rand_state = 54
 test_fraction = 0.5
@@ -47,8 +47,7 @@ def k_fold_s_crossval(x_train_data , y_train_data , k_value , classifier):
     # k fold cross validation
     rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
     result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf)
-    print(result)
-    print("Avg accuracy on train set: {}".format(result.mean()))
+    print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
 
 
 def test_n_results(x_test_data , y_test_data , classifier , description:str = ""):
@@ -74,19 +73,13 @@ def test_n_results(x_test_data , y_test_data , classifier , description:str = ""
     print("\nAvg score on test dataset = {}".format(classifier.score(x_test_data , y_test_data)))
     print(classifier)
 
-def rf_model( local_features_file, annotated_file : str = ""  , description : str = ""):
-    # get the dataset from the files
-    features = pd.DataFrame()
-    labels = pd.DataFrame()
-    if annotated_file == "":
-        features = pd.read_csv(local_features_file)
-        labels = features['annotation']
-        features.drop(['annotation'] , axis = 'columns' , inplace = True)
+def GaussianNB_model( local_features_file, annotated_file : str = ""  , description : str = ""):
+     # get the dataset from the files
+    features = pd.read_csv(local_features_file)
+    labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
 
-    else:
-        features = pd.read_csv(local_features_file)
-        labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
-        
+    if local_features_file == all_features_file and 'annotation' in features.columns :
+        features.drop(['annotation'] , axis = 'columns' , inplace = True)
     
     assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
     # split the dataset using test_train_split() function
@@ -101,8 +94,15 @@ def rf_model( local_features_file, annotated_file : str = ""  , description : st
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf , description)
 
-print("\n~~~~~ Gaussian NB:: W/O AE FEATURES ~~~~~")
-rf_model(features_file , intra_annotated_file , description = "w/o AE features")
-print("\n~~~~~ Gaussian NB:: WITH ALL FEATURES ~~~~~")
-rf_model( all_features_file , description = "with all features")
+# print("\n~~~~~ Gaussian NB:: W/O AE FEATURES ~~~~~")
+# rf_model(features_file , intra_annotated_file , description = "w/o AE features")
+# print("\n~~~~~ Gaussian NB:: WITH ALL FEATURES ~~~~~")
+# rf_model( all_features_file , description = "with all features")
 
+#~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+print("\n~~~~~ GaussianNB:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
+GaussianNB_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
+print("\n~~~~~ GaussianNB::All FEATURES :: RE ANNOTATION ~~~~~")
+GaussianNB_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")
+print("\n~~~~~ GaussianNB:: WITH AE FEATURES ONLY ~~~~~")
+GaussianNB_model( ae_features_file, '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "with AE features only")

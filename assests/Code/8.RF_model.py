@@ -6,7 +6,7 @@ test_fraction = 0.5
 num_trees = 15
 split_criteria = "entropy"
 
-# k of k flod cross validation
+# k of k fold cross validation
 k = 9 # change if you want to experiment
 
 # class list
@@ -38,17 +38,13 @@ from collections import Counter
 # ~~~~~~~~~~~~END LIBRARIES~~~~~~~~~~~~~~~~~~~~~
 
 def create_train_classifier(x_train_data , y_train_data):
-    # fit the decision tree model into the train set
-    classifier = RandomForestClassifier(n_estimators = num_trees , random_state = rand_state , criterion = split_criteria)
-    classifier.fit(x_train_data , y_train_data)
-    return classifier
-
+    return RandomForestClassifier(n_estimators = num_trees , random_state = rand_state \
+                                  , criterion = split_criteria, verbose = 1).fit(x_train_data , y_train_data)
+    
 def k_fold_s_crossval(x_train_data , y_train_data , k_value , classifier):
-    # k fold cross validation
     rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
-    result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf)
-    print(result)
-    print("Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
+    result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf , verbose = 1)
+    print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
 
 
 def test_n_results(x_test_data , y_test_data , classifier , description:str = ""):
@@ -68,6 +64,11 @@ def test_n_results(x_test_data , y_test_data , classifier , description:str = ""
     ax.set_yticklabels(class_list, rotation = 0)
     plt.show()
 
+    # # roc curve plot
+    # ax = plt.gca()
+    # rfc_disp = metrics.RocCurveDisplay.from_estimator(classifier, x_test_data, y_test_data, ax=ax, alpha=0.8)
+    # plt.show()
+
     # classification report
     print(f"Confu mtrx = \n{confusion_matrix}")
     print("\nClassification Report:\n")
@@ -80,7 +81,10 @@ def rf_model( local_features_file, annotated_file , description : str = ""):
     features = pd.read_csv(local_features_file)
     labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row
 
-    if local_features_file == all_features_file and 'annotation' in features.columns :
+    if local_features_file == annotated_file:
+        features.drop(index=0, inplace=True)
+        features = features.T
+    if 'annotation' in features.columns :
         features.drop(['annotation'] , axis = 'columns' , inplace = True)
 
     assert not np.any(np.isnan(features)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
@@ -96,18 +100,21 @@ def rf_model( local_features_file, annotated_file , description : str = ""):
     k_fold_s_crossval(x_train , y_train , k , clf)
     test_n_results(x_test , y_test , clf , description)
 
+# print("\n~~~~~ RF:: directly feeding sample values ~~~~~")
+# rf_model(intra_annotated_file , intra_annotated_file , description = "Sample values")
 # print("\n~~~~~ RF:: W/O AE FEATURES ~~~~~")
-# rf_model(features_file , intra_annotated_file , description = "w/o AE features")
-
-    
+# rf_model(features_file , intra_annotated_file , description = "Statistical features")
 # print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
-# rf_model( all_features_file , intra_annotated_file , description = "with all features")
-
+# rf_model( all_features_file , intra_annotated_file , description = "All features")
 # print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
 # rf_model( ae_features_file, intra_annotated_file , description = "with AE features only")
 
 #~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+print("\n~~~~~ RF:: directly feeding sample values :: RE ANNOTATION ~~~~~")
+rf_model('5.Ten_sec_annotated_data/patient_0_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Sample values")
 print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
 rf_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
 print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
 rf_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")
+print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
+rf_model( ae_features_file, '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "with AE features only")
