@@ -3,10 +3,13 @@ from imported_files.paths_n_vars import filtered_folder, segmented_folder \
                                          shift_len_seconds
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
-input_folder = filtered_folder
-output_folder = segmented_folder
-# debug only 
-save = False
+# for filtered segments
+# input_folder = filtered_folder
+# output_folder = segmented_folder
+
+# for unfiltered segments
+input_folder = "2.10min_csv_data"
+output_folder = "4.Ten_sec_segmented_unfiltered"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import pandas as pd
@@ -50,8 +53,8 @@ def segmentator(filtered_csv_path , segmented_csv_path):
         # plot_signal(range(len(current_segment)) , current_segment , "Samples", "PPG Signal" , "Segment {}".format(i))
         segmented_df[f"Segment {i + 1}"] = current_segment
     
-    if save:
-        segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
+    
+    segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
 
 csv_list = os.listdir(input_folder)
 

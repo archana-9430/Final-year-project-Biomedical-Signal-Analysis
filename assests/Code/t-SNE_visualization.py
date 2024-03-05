@@ -46,7 +46,8 @@ def tSNE_visualization(path):
         annotations = dataframe['annotation']
         dataframe.drop(['annotation'] , axis = 1 , inplace = True)
     else:
-        annotations = pd.read_csv(intra_annotated_file).iloc[ 0 ]
+        # annotations = pd.read_csv(intra_annotated_file).iloc[ 0 ]
+        annotations = pd.read_csv('5.Ten_sec_annotated_data/patient_0_1_10.csv').iloc[ 0 ]
 
     print(f"annotation of file : {path} are:\n{annotations}")
 
@@ -69,6 +70,9 @@ def tSNE_visualization(path):
     
 # tSNE_visualization(features_file)
 # tSNE_visualization(all_features_file)
+
+# adhoc
+tSNE_visualization(all_features_file)
 
 #%%
 import seaborn as sns

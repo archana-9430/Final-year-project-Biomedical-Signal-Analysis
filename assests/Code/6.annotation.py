@@ -1,21 +1,23 @@
-from imported_files.paths_n_vars import segmented_folder , annotated_folder
+from imported_files.paths_n_vars import segmented_folder , annotation_folder , re_annotation_folder
 
+# for filtered files
 input_folder = segmented_folder
-output_folder = annotated_folder
+# output_folder = annotation_folder #~~~ for previous annotation
+#~~~ new annotation
+output_folder = re_annotation_folder
+
+# for unfiltered files
+# input_folder = "4.Ten_sec_segmented_unfiltered"
+# output_folder = "5.Annotation_unfiltered"
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 # class list
-class_list = ["0" , "1" , "2"] # good segn = 0 , partly clean signal = 1 , corrupted = 2
-
-#for debugging only
-save_anno = True
-
+class_list = ["0" , "1" , "2"] # good segn = 0 , partly Corrupted signal = 1 , corrupted = 2
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import os
 from pprint import pprint
 import pandas as pd
-import matplotlib.pyplot as plt
 from imported_files.plot import plot_signal_interactive
 
 
@@ -39,7 +41,7 @@ def annotator(segmented_file_path , annotated_file_path):
 
     # annotation starts
     print("~~~~~ANNOTATION Starts~~~~~~\n")
-    print("Good Signal = Class 0\nPartly Clean Signal = Class 1\nCorrupted Signal = Class 2")
+    print("Good Signal = Class 0\nPartly Corrupted Signal = Class 1\nCorrupted Signal = Class 2")
 
     num_segments = ppg_df.shape[1]
     annotation_df = pd.DataFrame() # Create an empty dataframe to contain annotated data
@@ -56,11 +58,9 @@ def annotator(segmented_file_path , annotated_file_path):
         annotation_df["Segment {}".format(i)] = current_segment
         
         # save on each annotation
-        if(save_anno is True):
-            annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) # save on each segment
+        annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) # save on each segment
 
-    if(save_anno is True):
-        annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
+    annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
 
 
 # Get the list of all files and directories

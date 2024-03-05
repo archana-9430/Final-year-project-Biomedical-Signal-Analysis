@@ -35,6 +35,7 @@ def symbolize(data, num_levels):
     min_val = np.min(data)
     max_val = np.max(data)
     step_size = (max_val - min_val) / num_levels
+    
     symbols = np.floor((data - min_val) / step_size).astype(int)
     return symbols
 
@@ -115,12 +116,14 @@ def mean_psd(segment, fs):
     and averaging the squared magnitudes of the resulting spectra to obtain the PSD estimate.
     '''
     std_psd = np.std(psd)
-    # mean_psd = np.mean(psd)
+    mean_psd = np.mean(psd)
     #accessing the maximum frequency from the index of the maximum power value in the PSD array
     dominant_frequency = f[np.argmax(psd)]
+    # if dominant_frequency == 0:
+
     normalized_psd = psd / np.sum(psd)
     spectral_entropy = -np.sum(normalized_psd * np.log2(normalized_psd))
-    return std_psd, dominant_frequency, spectral_entropy
+    return std_psd, dominant_frequency , spectral_entropy
 
 def fourier_kurtosis(signal):
     fourier_transform = fft(signal)
@@ -152,6 +155,6 @@ def statistical(segment : np.ndarray):
     features['rmssd'] = rmssd(segment)
 
     #Frequency domain
-    features['std_psd'], features['dominant_freq'], features['spectral_entropy'] = mean_psd(segment, 125)
+    features['std_psd'], features['dominant_freq'] , features['spectral_entropy'] = mean_psd(segment, 125)
     features['fourier_kurtosis'] = fourier_kurtosis(segment)
     return features

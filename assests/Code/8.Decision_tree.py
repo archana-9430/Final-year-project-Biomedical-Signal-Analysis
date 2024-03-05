@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import all_features_file, intra_annotated_file, features_file
+from imported_files.paths_n_vars import all_features_file, intra_annotated_file, features_file, ae_features_file
 
 rand_state = 54
 test_fraction = 0.5
@@ -45,8 +45,7 @@ def k_fold_s_crossval(x_train_data , y_train_data , k_value , classifier):
     # k fold cross validation
     rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
     result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf)
-    print(result)
-    print("Avg accuracy on train set: {}".format(result.mean()))
+    print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
 
 def get_num_leaf_nodes(classifier , x_train_data):
     # Get the leaf node indices
@@ -146,9 +145,13 @@ def dt_model( local_features_file, annotated_file : str = ""  , description : st
 # dt_model(features_file ,intra_annotated_file ,  "w/o AE features")
 # print("\n~~~~~ DECISION TREE:: WITH ALL FEATURES ~~~~~")
 # dt_model(all_features_file , description = "with all features")
+print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
+dt_model( ae_features_file, intra_annotated_file , description = "with AE features only")
     
-#~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
-print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
-dt_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
-print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
-dt_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")
+# #~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
+# print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
+# dt_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
+# print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
+# dt_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")
+# print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
+# dt_model( ae_features_file, '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "with AE features only")
