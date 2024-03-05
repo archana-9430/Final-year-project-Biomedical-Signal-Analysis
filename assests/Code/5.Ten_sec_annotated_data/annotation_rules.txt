@@ -1,0 +1,15 @@
+Noise in PPG:
+In the context of Photoplethysmogram (PPG) signals, noise refers to any unwanted or interfering signals that can distort the original signal and degrade its quality12. Here are some common types of noise that can affect PPG signals:
+
+Motion Artifacts (MA): These are distortions in the signal caused by the movement of the subject or the sensor. This is one of the most common sources of noise in PPG signals, especially in wearable devices2.
+High-Frequency Noise: This can be caused by various factors such as electronic interference or environmental noise2.
+Power Line Interference: This is a type of noise that is induced by the electrical power supply. It typically appears as a 50 or 60 Hz signal in the PPG signal2.
+Baseline Drift: This is a slow, low-frequency variation in the signal baseline. It can be caused by factors such as changes in sensor contact, changes in ambient temperature, or physiological changes such as respiration2.
+Cross Talk Pickup of Other Physiological Signals: This is when signals from other physiological processes interfere with the PPG signal3.
+Instrumental Noise: This is noise that is introduced by the recording device itself3.
+These noises can significantly affect the accuracy of pulse rate analysis and SpO2 measurement2. Therefore, noise reduction techniques are often applied to PPG signals to improve their quality and reliability12.
+
+Thresholds:(%age of noise)
+clean < 0.1
+0.1 < partly_corrupted < 0.3
+corrupted > 0.3
