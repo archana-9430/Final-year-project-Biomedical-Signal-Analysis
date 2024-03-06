@@ -7,6 +7,7 @@ from scipy.stats import entropy, skew, kurtosis
 from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
+import statistics
 
 # decorator for chacking for nan return values
 import functools
@@ -141,6 +142,16 @@ def statistical(segment : np.ndarray):
     # print(type(segment))
     features['population_std'] = np.std(segment)
     features['sample_std'] = np.std(segment,  ddof=1)
+    features['variance'] = np.std(segment) ** 2
+    features['mean'] = np.mean(segment)
+    features['median'] = np.percentile(segment, 50)
+    features['q1'] = np.percentile(segment, 25)
+    features['q3'] = np.percentile(segment, 75)
+    features['max'] = max(segment)
+    features['min'] = min(segment)
+    features['range'] = max(segment) - min(segment)
+    features['cov'] = np.std(segment) / np.mean(segment)
+    features['mean_abs_dev'] = np.mean(segment - np.mean(segment))
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
     features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
@@ -150,7 +161,7 @@ def statistical(segment : np.ndarray):
     features['zero_crossing_rate'] = zero_crossing_rate(segment)
     features['interquartile_range'] = interquartile_range(segment)
     features['mean_absolute_power'] = mean_absolute_power(segment)
-    features['mean'] = np.mean(segment)
+
     features['rms'] = rms(segment)
     features['rmssd'] = rmssd(segment)
 
