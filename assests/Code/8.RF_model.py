@@ -4,7 +4,7 @@ from imported_files.paths_n_vars import features_file, intra_annotated_file, all
 rand_state = 54
 test_fraction = 0.5
 num_trees = 15
-split_criteria = "entropy"
+split_criteria = "gini"
 
 # k of k fold cross validation
 k = 9 # change if you want to experiment
@@ -110,11 +110,11 @@ def rf_model( local_features_file, annotated_file , description : str = ""):
 # rf_model( ae_features_file, intra_annotated_file , description = "with AE features only")
 
 #~~~~~~~~~ AFTER REANNOTATION ~~~~~~~~~~
-print("\n~~~~~ RF:: directly feeding sample values :: RE ANNOTATION ~~~~~")
-rf_model('5.Ten_sec_annotated_data/patient_0_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Sample values")
+# print("\n~~~~~ RF:: directly feeding sample values :: RE ANNOTATION ~~~~~")
+# rf_model('5.New_annotated_data\patient_0_1_10.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "Sample values")
 print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
-rf_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "Statistical features")
-print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
-rf_model('6.Features_extracted/all_features.csv' , '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "All features")
-print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
-rf_model( ae_features_file, '5.Ten_sec_annotated_data/patient_0_1_10.csv' , description = "with AE features only")
+rf_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "Statistical features")
+# print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
+# rf_model('6.Features_extracted/all_features.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "All features")
+# print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
+# rf_model( ae_features_file, '5.New_annotated_data\patient_0_1_10.csv' , description = "with AE features only")

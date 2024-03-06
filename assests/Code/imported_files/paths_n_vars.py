@@ -23,6 +23,8 @@ inter_test = 'Test'
 inter_test_file = 'Inter/Test/combined_annotated_test.csv'
 inter_train_file = 'Inter/Train/combined_annotated_train.csv'
 intra_annotated_file = 'Intra/combined_annotated.csv'
+encoder_save = 'AE_model/encoder_model.keras'
+decoder_save = 'AE_model/decoder_model.keras'
 
 # variables
 sampling_frequency = 125 # in Hertz
