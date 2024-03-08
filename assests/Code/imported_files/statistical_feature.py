@@ -8,6 +8,7 @@ from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
 import statistics
+from EntropyHub import PermEn, ApEn , SampEn, K2En, DistEn, DispEn
 
 # decorator for chacking for nan return values
 import functools
@@ -47,6 +48,7 @@ def permutation_entropy(data, order, num_levels):
     probabilities = counts / len(patterns)
     entropy_val = -np.sum(probabilities * np.log2(probabilities))
     return entropy_val
+
 
 def svd_entropy(data):
     # Convert pandas Series to numpy array
@@ -117,7 +119,7 @@ def mean_psd(segment, fs):
     and averaging the squared magnitudes of the resulting spectra to obtain the PSD estimate.
     '''
     std_psd = np.std(psd)
-    mean_psd = np.mean(psd)
+    # mean_psd = np.mean(psd)
     #accessing the maximum frequency from the index of the maximum power value in the PSD array
     dominant_frequency = f[np.argmax(psd)]
     # if dominant_frequency == 0:
@@ -155,7 +157,26 @@ def statistical(segment : np.ndarray):
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
     features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
+    # ENTROPY FEATURES
+
+    # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
+
+    _ , temp, _ = PermEn(segment, m = 5, tau = 1)
+    features['permutation_entropy_EN'] = temp[-1]
+
+    temp, _ = ApEn(segment, m = 5, tau = 1)
+    features['Approx_entropy_EN'] = temp[-1]
+
+    # temp , _ , _ = SampEn(segment, m = 5, tau = 1)
+    # features['Sample_entropy_EN'] = temp[-1]
+
+    # temp , _ = K2En(segment, m = 2, tau = 1)
+    # features['Kolmogorov_entropy_EN'] = temp[-1]
+
+    # features['Distribution_entropy_EN'] , _ = DistEn(segment, m = 3, tau = 1)1
+
     # features['svd_entropy'] = svd_entropy(segment)
+    
     features['Shannon entropy'] = shannon_entropy(segment)
     features['first_derivative_std'] = first_derivative_std(segment)
     features['zero_crossing_rate'] = zero_crossing_rate(segment)
