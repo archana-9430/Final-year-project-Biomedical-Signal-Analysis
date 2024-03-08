@@ -1,5 +1,6 @@
 from imported_files.paths_n_vars import inter_train_file, inter_test_file, intra_annotated_file, features_file , ae_features_file , all_features_file
 from imported_files.statistical_feature import statistical
+from imported_files.merge import merge_csv
 
 import pandas as pd
 import numpy as np
@@ -38,6 +39,7 @@ def add_annotation(annotation_file, feature_file):
 # add_annotation(intra_annotated_file, all_features_file)
 
 # reannotation
-store_features(features_file[:-4] + '_filtered_1_1_10.csv', '5.New_annotated_data/patient_0_1_10.csv')
+merge_csv("5.New_annotated_data", "5.New_annotated_data/merged.csv")
+store_features('6.Features_extracted/new_features_merged.csv', '5.New_annotated_data/merged.csv')
 # merge_all_features(features_file[:-4] + '_filtered_1_1_10.csv' , ae_features_file , all_features_file)
 # add_annotation(intra_annotated_file, all_features_file)

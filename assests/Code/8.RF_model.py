@@ -113,7 +113,7 @@ def rf_model( local_features_file, annotated_file , description : str = ""):
 # print("\n~~~~~ RF:: directly feeding sample values :: RE ANNOTATION ~~~~~")
 # rf_model('5.New_annotated_data\patient_0_1_10.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "Sample values")
 print("\n~~~~~ RF:: W/O AE FEATURES :: RE ANNOTATION ~~~~~")
-rf_model('6.Features_extracted/features_filtered_1_1_10.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "Statistical features")
+rf_model('6.Features_extracted/new_features_merged.csv' , '5.New_annotated_data\merged.csv' , description = "Statistical features")
 # print("\n~~~~~ RF::All FEATURES :: RE ANNOTATION ~~~~~")
 # rf_model('6.Features_extracted/all_features.csv' , '5.New_annotated_data\patient_0_1_10.csv' , description = "All features")
 # print("\n~~~~~ RF:: WITH AE FEATURES ONLY ~~~~~")
