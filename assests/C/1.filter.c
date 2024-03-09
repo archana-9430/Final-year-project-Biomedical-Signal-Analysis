@@ -99,18 +99,18 @@ a:  [ 1.         -3.72743886  5.21865042 -3.25449722  0.76328926]*/
         printf("%d: %f\n", i, data[i]);
     }
     // Save filtered data to a new CSV file
-    // FILE *file2 = fopen("filtered_data.csv", "w");
-    // if (file2 == NULL) {
-    //     printf("Error opening file!\n");
-    //     return 1;
-    // }
+    FILE *file2 = fopen("filtered_data.csv", "w");
+    if (file2 == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
 
-    // // Write filtered data to the file
-    // for (int i = 0; i < data_length; i++) {
-    //     fprintf(file, "%f\n", data[i]);
-    // }
+    // Write filtered data to the file
+    for (int i = 0; i < data_length; i++) {
+        fprintf(file, "%f\n", data[i]);
+    }
 
-    // fclose(file2);
+    fclose(file2);
     
     return 0;
 }
