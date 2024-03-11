@@ -21,6 +21,7 @@ def merge_csv(input_folder, merge_path , save : bool = True):
         print(f"MERGED FILE ({merge_path}) ALREADY EXISTS::SO REMOVING IT FIRST")
         os.remove(merge_path)
     dir_list = os.listdir(input_folder)
+    dir_list.sort()
     merged_df = pd.DataFrame()
 
     # process only the csv files
@@ -46,6 +47,7 @@ def merge_csv(input_folder, merge_path , save : bool = True):
 
     if save:
         merged_df.to_csv(merge_path, index=False, header=False)
+        print("file saved at: ", merge_path)
 
     return merged_df
 

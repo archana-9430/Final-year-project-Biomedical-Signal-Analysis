@@ -4,10 +4,14 @@ Contains crucial (relative) folder paths and various variables for entire workfl
 
 # folder paths
 csv_data_fol = '1.10min_csv_data'
-csv_noise_fol = '1.Csv_noise_DaLiA'
-ten_min_csv_fol = '2.10min_csv_data'
-filtered_folder = '3.filtered_csv_data'
 segmented_folder = '2.segmented_data'
+annotated_data_fol = "3.annotated_data"
+annotated_merged = "annotated_merged.csv"
+fitered_folder = "4.filtered_data"
+filtered_merged = 'filtered_merged.csv'
+
+
+
 annotation_folder = '5.Ten_sec_annotated_data'
 new_annotation_folder = '5.New_annotated_data'
 features_folder = '6.Features_extracted'
