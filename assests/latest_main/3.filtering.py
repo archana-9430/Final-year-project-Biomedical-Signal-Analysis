@@ -39,16 +39,14 @@ class Filter():
 
     def butterworth_bp_filter(self, data_file_path, filtered_data_file_path):
         df = pd.read_csv(data_file_path)
-        print(df)
         annotation = df.iloc[0]
-        print(annotation)
         # df.drop(index=0,inplace=True, axis=0)
         # data = df.values.flatten()
-        ppg_values = df.values[0:]
-        print(ppg_values)
+        ppg_values = df.values[1:]
+        # print("shape of ppg_values data = ",ppg_values.shape)
         filtered_data = filtfilt(self.b, self.a, ppg_values , axis = 0)
-        print("shape of filtered data = ",filtered_data.shape)
-        anno_filt = np.insert(filtered_data,0,values=annotation.values , axis = 1)
+        # print("shape of filtered data = ",filtered_data.shape)
+        anno_filt = np.insert(filtered_data,0,values=annotation.values , axis = 0)
         merged_df = pd.DataFrame(data = anno_filt , columns = df.columns)
         merged_df.to_csv(filtered_data_file_path , index = False)
         
