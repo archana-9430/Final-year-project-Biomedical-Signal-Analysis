@@ -108,5 +108,18 @@ def plot_csv(csv_path:str):
         fig_num += 1
         plot_csv_data(f"{csv_path}\\{csv_file}", fig_num)
 
-check_n_uniform()
-# plot_csv(output_fol)
+
+def _main_segment10min():
+    # # Uncomment this code for running this code
+    check_n_uniform()
+    # plot_csv(output_fol)
+
+
+if __name__ == "__main__":
+    import time
+    s = time.perf_counter()
+    
+    _main_segment10min()
+    
+    elapsed = time.perf_counter() - s
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")

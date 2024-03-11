@@ -156,7 +156,7 @@ def statistical(segment : np.ndarray):
     features['mean_abs_dev'] = np.mean(segment - np.mean(segment))
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
-    features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
+    # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
     # ENTROPY FEATURES
 
     # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
@@ -177,9 +177,9 @@ def statistical(segment : np.ndarray):
 
     # features['svd_entropy'] = svd_entropy(segment)
     
-    features['Shannon entropy'] = shannon_entropy(segment)
+    features['Shannon entropy'] = shannon_entropy(segment)#~~
     features['first_derivative_std'] = first_derivative_std(segment)
-    features['zero_crossing_rate'] = zero_crossing_rate(segment)
+    features['zero_crossing_rate'] = zero_crossing_rate(segment)#~~
     features['interquartile_range'] = interquartile_range(segment)
     features['mean_absolute_power'] = mean_absolute_power(segment)
 

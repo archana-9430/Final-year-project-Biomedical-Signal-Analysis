@@ -1,10 +1,10 @@
-from imported_files.paths_n_vars import segmented_folder , annotation_folder , re_annotation_folder
+from imported_files.paths_n_vars import segmented_folder , annotation_folder , new_annotation_folder
 
 # for filtered files
 input_folder = segmented_folder
 # output_folder = annotation_folder #~~~ for previous annotation
 #~~~ new annotation
-output_folder = re_annotation_folder
+output_folder = new_annotation_folder
 
 # for unfiltered files
 # input_folder = "4.Ten_sec_segmented_unfiltered"
@@ -62,16 +62,25 @@ def annotator(segmented_file_path , annotated_file_path):
 
     annotation_df.to_csv(path_or_buf = annotated_file_path , index = False) #save the file
 
+def _main_annotation():
+    # Get the list of all files and directories
+    csv_list = os.listdir(input_folder)
+    pprint(f"{csv_list}, {len(csv_list)}")
+    # for csv_file in csv_list:
+    #     print(f"{segmented_folder}\\{csv_file}")
 
-# Get the list of all files and directories
-csv_list = os.listdir(input_folder)
-pprint(f"{csv_list}, {len(csv_list)}")
-# for csv_file in csv_list:
-#     print(f"{segmented_folder}\\{csv_file}")
+    for csv_file in csv_list:
+        if csv_file.split('.')[-1] == 'csv':
+            print(f"\nFILE NAME = {csv_file}")
+            annotator(f"{input_folder}\\{csv_file}", 
+                    f"{output_folder}\\{csv_file}"
+                    )
 
-for csv_file in csv_list:
-    if csv_file.split('.')[-1] == 'csv':
-        print(f"\nFILE NAME = {csv_file}")
-        annotator(f"{input_folder}\\{csv_file}", 
-                  f"{output_folder}\\{csv_file}"
-                )
+if __name__ == "__main__":
+    import time
+    start = time.perf_counter()
+    
+    _main_annotation()
+    
+    elapsed = time.perf_counter() - start
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")

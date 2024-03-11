@@ -4,16 +4,15 @@ from imported_files.paths_n_vars import filtered_folder, segmented_folder \
 
 #~~~~~~~~~~~~~~~~~~~~~~Check these before running~~~~~~~~~~~~~~~~~~~~~~~~~
 # for filtered segments
-# input_folder = filtered_folder
-# output_folder = segmented_folder
+input_folder = filtered_folder
+output_folder = segmented_folder
 
-# for unfiltered segments
-input_folder = "2.10min_csv_data"
-output_folder = "4.Ten_sec_segmented_unfiltered"
+# # for unfiltered segments
+# input_folder = "2.10min_csv_data"
+# output_folder = "4.Ten_sec_segmented_unfiltered"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import pandas as pd
-import numpy as np
 import os
 import matplotlib.pyplot as plt
 
@@ -56,7 +55,18 @@ def segmentator(filtered_csv_path , segmented_csv_path):
     
     segmented_df.to_csv(path_or_buf = f"{segmented_csv_path}" , index = False) #save the file
 
-csv_list = os.listdir(input_folder)
+def _main_segmn_10sec():
+    csv_list = os.listdir(input_folder)
 
-for csv_file in csv_list:
-    segmentator(f"{input_folder}//{csv_file}" , f"{output_folder}//{csv_file}")
+    for csv_file in csv_list:
+        segmentator(f"{input_folder}//{csv_file}" , f"{output_folder}//{csv_file}")
+
+if __name__ == "__main__":
+    import time
+    start = time.perf_counter()
+    
+    _main_segmn_10sec()
+    
+    elapsed = time.perf_counter() - start
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")
+    

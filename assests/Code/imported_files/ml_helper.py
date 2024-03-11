@@ -70,6 +70,7 @@ class Ml_Model():
         self.classifier = self.create_classifier(ml_model_name)
 
     def create_classifier(self, ml_model_name:str):
+        if 
         return RandomForestClassifier(n_estimators = num_trees , random_state = rand_state \
                                   , criterion = split_criteria, verbose = 1)
 
