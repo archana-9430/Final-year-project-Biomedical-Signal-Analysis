@@ -1,11 +1,14 @@
-from imported_files.paths_n_vars import inter_train_file, inter_test_file, ae_derivative_features_file, intra_annotated_file, features_file , ae_features_file , all_features_file
+from imported_files.paths_n_vars import  filtered_merged, stats_features
 from imported_files.statistical_feature import statistical
 from imported_files.merge import merge_csv
 
 import pandas as pd
 import numpy as np
 
-def store_features(local_features_file, input_train_file):
+input_file = filtered_merged
+output_file = stats_features
+
+def store_features(input_train_file, local_features_file):
     df = pd.read_csv(input_train_file, skiprows=2, header=None) 
 
     import time
@@ -18,6 +21,11 @@ def store_features(local_features_file, input_train_file):
     assert not np.any(np.isnan(features_df)) , "ERROR::STORE FEATURES::RETURNS NAN VALUES"
     features_df.to_csv(local_features_file, index = False)
     print(features_df)
+    
+    df_annot = pd.read_csv(input_train_file)
+    annot_row = df_annot.iloc[0].values
+    annot_col = np.transpose(annot_row)
+    print("annot_col", annot_col)
 
 def merge_all_features(_features_file , _ae_features_file , _all_features_file):
     '''
@@ -43,7 +51,11 @@ def add_annotation(annotation_file, feature_file):
 # add_annotation(intra_annotated_file, all_features_file)
 
 # reannotation
-store_features(features_file[:-4] + '_re_anno.csv', '5.New_annotated_data/merged.csv')
-merge_all_features(features_file[:-4] + '_re_anno.csv' , ae_features_file , features_file[:-4] + '_ae_re_anno.csv')
-merge_all_features(features_file[ : -4] + "_ae_re_anno.csv" , ae_derivative_features_file , all_features_file[:-4] + '_re_anno.csv')
-add_annotation('5.New_annotated_data/merged.csv', all_features_file[:-4]+'_re_anno.csv')
+# store_features(features_file[:-4] + '_re_anno.csv', '5.New_annotated_data/merged.csv')
+# merge_all_features(features_file[:-4] + '_re_anno.csv' , ae_features_file , features_file[:-4] + '_ae_re_anno.csv')
+# merge_all_features(features_file[ : -4] + "_ae_re_anno.csv" , ae_derivative_features_file , all_features_file[:-4] + '_re_anno.csv')
+# add_annotation('5.New_annotated_data/merged.csv', all_features_file[:-4]+'_re_anno.csv')
+
+
+store_features(input_file, output_file)
+
