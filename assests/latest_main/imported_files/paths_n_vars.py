@@ -9,6 +9,7 @@ annotated_data_fol = "3.annotated_data"
 annotated_merged = "annotated_merged.csv"
 fitered_folder = "4.filtered_data"
 filtered_merged = 'filtered_merged.csv'
+stats_features = 'stats_features_merged.csv'
 
 
 
