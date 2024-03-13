@@ -8,6 +8,8 @@ from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
 import statistics
+import ordpy
+
 from EntropyHub import PermEn, ApEn , SampEn, K2En, DistEn, DispEn
 
 # # decorator for chacking for nan return values
@@ -67,7 +69,14 @@ def svd_entropy(data):
 def first_derivative_std(signal):
     first_derivative = np.gradient(signal)
     std_derivative = np.std(first_derivative)
-    return std_derivative    
+    return std_derivative   
+ 
+def Hjorth_parameters(signal):
+    first_derivative = np.gradient(signal)
+    signal_hjorth_mobility = np.sqrt(np.var(first_derivative)/np.var(signal))
+    derivative_hjorth_mobility = np.sqrt(np.var(np.gradient(first_derivative))/np.var(first_derivative))
+    hjorth_complexity = derivative_hjorth_mobility/signal_hjorth_mobility
+    return signal_hjorth_mobility,hjorth_complexity    
     
 def zero_crossing_rate(signal):
     zero_crossings = 0
@@ -161,8 +170,9 @@ def statistical(segment : np.ndarray):
 
     # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
 
-    _ , temp, _ = PermEn(segment, m = 5, tau = 1)
-    features['permutation_entropy_EN'] = temp[-1]
+    # _ , temp, _ = PermEn(segment, m = 5, tau = 1)
+    # features['permutation_entropy_EN'] = temp[-1]
+    features['permutation_entropy_EN'] = ordpy.permutation_entropy(segment , dx = 5)
 
     temp, _ = ApEn(segment, m = 5, tau = 1)
     features['Approx_entropy_EN'] = temp[-1]
@@ -179,6 +189,7 @@ def statistical(segment : np.ndarray):
     
     features['Shannon entropy'] = shannon_entropy(segment)#~~
     features['first_derivative_std'] = first_derivative_std(segment)
+    features['Hjorth mobility'] , features['Hjorth complexity'] = Hjorth_parameters(segment)
     features['zero_crossing_rate'] = zero_crossing_rate(segment)#~~
     features['interquartile_range'] = interquartile_range(segment)
     features['mean_absolute_power'] = mean_absolute_power(segment)

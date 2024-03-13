@@ -1,5 +1,5 @@
-from imported_files.paths_n_vars import stats_features, filtered_merged
-# import features_scaler as fScaler
+from imported_files.paths_n_vars import stats_features, filtered_merged, feature_merged
+from imported_files.ml_helper import Ml_Model
 
 rand_state = 54
 test_fraction = 0.5
@@ -15,96 +15,81 @@ k = 9 # change if you want to experiment
 # ~~~~~~~LIBRARIES~~~~~~~
 import pandas as pd
 import numpy as np
-import os
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-
-# for cross validation
-from sklearn.model_selection import RepeatedStratifiedKFold
-from sklearn.model_selection import cross_val_score
-
-# for creating confusion matrix
-from sklearn import metrics
-
-# to plot confusion matrix
-import matplotlib.pyplot as plt
-import seaborn as sns # seaborn for additional functionality such as heat map
-
-# additionals
-from sklearn.metrics import classification_report
 
 # to calculate number of instances of 0 and 1
 from collections import Counter
 # ~~~~~~~~~~~~END LIBRARIES~~~~~~~~~~~~~~~~~~~~~
 
-def create_train_classifier(x_train_data , y_train_data):
-    return RandomForestClassifier(n_estimators = num_trees , random_state = rand_state \
-                                  , criterion = split_criteria, verbose = 1).fit(x_train_data , y_train_data)
-    
-def k_fold_s_crossval(x_train_data , y_train_data , k_value , classifier):
-    rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
-    result = cross_val_score(classifier , x_train_data , y_train_data , cv = rskf , verbose = 1 , n_jobs = -1)
-    print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
-
-
-def test_n_results(x_test_data , y_test_data , classifier , description:str = ""):
-
-    # Now TESTING the model and showing the results:
-    # confusion matrix 
-    test_pred_decision_tree = classifier.predict(x_test_data)
-    confusion_matrix = metrics.confusion_matrix(y_test_data , test_pred_decision_tree)
-    class_list = np.unique(y_test_data)
-    ax = plt.axes()
-    sns.set_theme(font_scale=1.3)
-    sns.heatmap(confusion_matrix , annot = True , fmt = "g" , ax = ax , cmap = "magma")
-    ax.set_title('Confusion Matrix - Random Forest: ' + description)
-    ax.set_xlabel("Predicted label" , fontsize = 15)
-    ax.set_xticklabels(class_list)
-    ax.set_ylabel("True Label", fontsize = 15)
-    ax.set_yticklabels(class_list, rotation = 0)
-    plt.show()
-
-    # # roc curve plot
-    # ax = plt.gca()
-    # rfc_disp = metrics.RocCurveDisplay.from_estimator(classifier, x_test_data, y_test_data, ax=ax, alpha=0.8)
-    # plt.show()
-
-    # classification report
-    print(f"Confu mtrx = \n{confusion_matrix}")
-    print("\nClassification Report:\n")
-    print(classification_report(y_test_data, test_pred_decision_tree))
-    print("\nAvg score on test dataset = {}".format(classifier.score(x_test_data , y_test_data)))
-    print(classifier)
-    return test_pred_decision_tree
-
-def rf_model(local_features_file ,filtered_merged,  description : str = ""):
+def rf_model_function( local_features_file, annotated_file , description : str = ""):
+    # get the dataset from the files
     features = pd.read_csv(local_features_file)
-    
-    filtered_merged = pd.read_csv(filtered_merged)
-    labels = filtered_merged.iloc[0]
-    print("labels_size: ", labels.size)
-    labels = labels[:-1]
-    labels = labels.T
-    
-    features.drop(index=0, inplace=True)
-    # features = features.T
-    print("features_size: ", features.size)
+    labels = pd.read_csv(annotated_file).iloc[0] # this will exract the annotation 2nd row    
+    class_list = np.unique(labels)
 
-    # print("Features df:\n" , features)
-    assert not np.any(np.isnan(features.values)) , "ERROR::FEATURES DATAFRAME HAS NAN VALUES"
-    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
+    if local_features_file == annotated_file:
+        features.drop(index=0, inplace=True)
+        features = features.T
+        
+    if 'annotation' in features.columns :
+        features.drop(['annotation'] , axis = 'columns' , inplace = True)
 
-    print("Number of features: ", features.shape[1] - 1)
+    features_train, features_test, y_train, y_test = train_test_split(features, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
+
+    if 'PatientID' in features.columns:
+        pID_train = features_train['PatientID']
+        pID_test = features_test['PatientID']
+        x_train = features_train.drop(['PatientID'] , axis = 'columns')
+        x_test = features_test.drop(['PatientID'] , axis = 'columns')
+
+    else:
+        x_train = features_train
+        x_test = features_test
+
+    print("Number of features: ", x_train.shape[1])
     num_instances_train = dict(Counter(y_train))
     num_instances_test = dict(Counter(y_test))
     print(f"Train instances : {num_instances_train}")
     print(f"Test instances : {num_instances_test}")
 
-    clf = create_train_classifier(x_train , y_train)
-    k_fold_s_crossval(x_train , y_train , k , clf)
-    y_pred = test_n_results(x_test , y_test , clf , description)
+    # create and train classifier
+    rf_model = Ml_Model('rf' , n_estimators = num_trees , random_state = rand_state \
+                                  , criterion = split_criteria, verbose = 1)
+    rf_model.classifier.fit(x_train , y_train)
+    rf_model.k_fold_strat_crossval(x_train , y_train , k , rand_state)
+    y_pred = rf_model.test_n_results(x_test , y_test , description)
+    
+    if 'PatientID' in features.columns:
+        # identifying miss-classisfied segments and saving them
+        classification_rep = tuple(zip(pID_test.values , y_test.values , y_pred))
+        num_patients = np.unique( [x.split('_')[0] for x in pID_test.values])
+        print('number of patients = ',num_patients)
+        dataset = pd.read_csv('annotated_merged.csv')
 
+        dataset[[x[0] for x in classification_rep if x[2] == 0] ].to_csv(path_or_buf = 'Stage_2/clean.csv',index = False)
+        dataset[[x[0] for x in classification_rep if x[2] == 1] ].to_csv(path_or_buf = 'Stage_2/partly_corrupted.csv',index = False)
+        dataset[[x[0] for x in classification_rep if x[2] == 2] ].to_csv(path_or_buf = 'Stage_2/corrupted.csv',index = False)
+
+
+        allMissClassifications = [x for x in classification_rep if x[1] != x[2]] # x[1] -> true labels :: x[2] -> predicted labels
+        
+        
+        missClasslist = []
+        for i in range(len(class_list)):
+            innerList = []
+            for j in range(len(class_list)):
+                temp = [x[0] for x in allMissClassifications if ((x[1] == i) and (x[2] == j))] 
+                if len(temp) > 0:
+                    innerList.append(temp)
+                    dataset[temp].to_csv(path_or_buf = f'4.missclassifications/missclassification_Of{i}_to_{j}.csv',index = False)
+            if len(innerList) > 0:
+                missClasslist.append(innerList)
+                
+    else:
+        print('Patient ID not given so cannot identify missclassified patients...')
+    
 print("\n~~~~~ RF:: W/O AE FEATURES ~~~~~")
-rf_model(stats_features, filtered_merged, description = "Statistical features")
-# print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
-# rf_model( '6.Features_extracted/all_features_re_anno.csv' , intra_annotated_file , description = "All features")
+rf_model_function(stats_features, filtered_merged, description = "Statistical features")
+
+print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
+rf_model_function(feature_merged, filtered_merged, description = "All features")

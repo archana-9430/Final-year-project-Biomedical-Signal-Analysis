@@ -2,6 +2,7 @@
 from numpy import unique
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
+
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 
@@ -78,7 +79,7 @@ class Ml_Model():
             plt.show()
 
         # classification report
-        print(f"Confu mtrx = \n{confusion_matrix}")
+        print(f"Confu mtrx = \n{confu_mtrx}")
         print("\nClassification Report:\n")
         print(classification_report(y_test_data, test_pred))
         print("\nAvg score on test dataset = {}".format(self.classifier.score(x_test_data , y_test_data)))

@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import  filtered_merged, stats_features
+from imported_files.paths_n_vars import  filtered_merged, stats_features, AE_features, feature_merged
 from imported_files.statistical_feature import statistical
 from imported_files.merge import merge_csv
 
@@ -37,25 +37,27 @@ def merge_all_features(_features_file , _ae_features_file , _all_features_file):
     print(all_features_df)
     all_features_df.to_csv(_all_features_file , index=False)
     
-def add_annotation(annotation_file, feature_file):
+    
+def add_patientID_annotation(annotation_file, feature_file):
     '''
-    ADD ANNOTATION TO FINAL FEATURES FILE IN COLUMN_1
+    ADD PATIENT ID AND ANNOTATION TO FINAL FEATURES FILE IN COLUMN_1 and COLUMN_2 respectively
     '''
-    annotation_row = pd.read_csv(annotation_file, skiprows=1, nrows=1, header=None)
+    annotation_row = pd.read_csv(annotation_file, nrows=2, header=None)
     target_df = pd.read_csv(feature_file)
-    target_df.insert(0, 'annotation', annotation_row.iloc[0])
+    target_df.insert(0, 'annotation', annotation_row.iloc[1])
+    target_df.insert(0, 'PatientID', annotation_row.iloc[0])
     target_df.to_csv(feature_file, index=False)
 
-# store_features(features_file, intra_annotated_file)
-# merge_all_features(features_file , ae_features_file , all_features_file)
-# add_annotation(intra_annotated_file, all_features_file)
+def _main_feature_ext():
+    store_features(input_file, output_file)
+    merge_all_features(stats_features , AE_features , feature_merged)
+    add_patientID_annotation(input_file, feature_merged)
 
-# reannotation
-# store_features(features_file[:-4] + '_re_anno.csv', '5.New_annotated_data/merged.csv')
-# merge_all_features(features_file[:-4] + '_re_anno.csv' , ae_features_file , features_file[:-4] + '_ae_re_anno.csv')
-# merge_all_features(features_file[ : -4] + "_ae_re_anno.csv" , ae_derivative_features_file , all_features_file[:-4] + '_re_anno.csv')
-# add_annotation('5.New_annotated_data/merged.csv', all_features_file[:-4]+'_re_anno.csv')
+if __name__ == "__main__":
+    import time
+    start = time.perf_counter()
 
+    _main_feature_ext()
 
-store_features(input_file, output_file)
+    print(f"{__file__} took {time.perf_counter() - start : 0.6f} seconds" )
 

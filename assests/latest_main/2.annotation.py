@@ -83,7 +83,7 @@ if __name__ == "__main__":
     
     # _main_annotation()
     
-    # elapsed = time.perf_counter() - start
-    # print(f"{__file__} executed in {elapsed:0.2f} seconds.")
-    
     merge_csv("3.annotated_data", annotated_merged)
+    elapsed = time.perf_counter() - start
+    print(f"{__file__} executed in {elapsed:0.2f} seconds.")
+    
