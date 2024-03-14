@@ -147,9 +147,10 @@ def statistical(segment : np.ndarray):
     '''
     Ensure the argument is a numpy array
     '''
-
     features = {}
-    #Time domain:
+    
+    ''' TIME DOMAIN: '''
+    
     # print(type(segment))
     features['population_std'] = np.std(segment)
     features['sample_std'] = np.std(segment,  ddof=1)
@@ -165,11 +166,10 @@ def statistical(segment : np.ndarray):
     features['mean_abs_dev'] = np.mean(segment - np.mean(segment))
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
-    # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
-    # ENTROPY FEATURES
+    
+    ''' ENTROPY FEATURES '''
 
     # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
-
     # _ , temp, _ = PermEn(segment, m = 5, tau = 1)
     # features['permutation_entropy_EN'] = temp[-1]
     features['permutation_entropy_EN'] = ordpy.permutation_entropy(segment , dx = 5)
@@ -197,7 +197,11 @@ def statistical(segment : np.ndarray):
     features['rms'] = rms(segment)
     features['rmssd'] = rmssd(segment)
 
-    #Frequency domain
+    ''' FREQUENCY DOMAIN '''
     features['std_psd'], features['dominant_freq'] , features['spectral_entropy'] = mean_psd(segment, 125)
     features['fourier_kurtosis'] = fourier_kurtosis(segment)
     return features
+
+    ''' MORPHOLOGICAL FEATURES '''
+    
+    ''' DWT FEATURES '''
