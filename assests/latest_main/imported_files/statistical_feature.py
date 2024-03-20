@@ -1,55 +1,49 @@
-import pandas as pd
+import functools
+import time
+def time_custom(function):
+    @functools.wraps(function)
+    def time_custom_wrapper(*arg , **kwargs):
+        start = time.perf_counter()
+        function_output = function(*arg , **kwargs)
+        print(f"{function.__name__} took {time.perf_counter() - start : 0.6f} seconds" )
+        return function_output
+    
+    return time_custom_wrapper
+
 import numpy as np
-import math
-# import nolds
-NAN_SUBSTITUTE = 0
-from scipy.stats import entropy, skew, kurtosis
+from scipy.stats import  skew, kurtosis
 from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
-import statistics
-import ordpy
+from ordpy import permutation_entropy
+from EntropyHub import  PermEn ,ApEn , SampEn, K2En, DistEn, DispEn
 
-from EntropyHub import PermEn, ApEn , SampEn, K2En, DistEn, DispEn
+NAN_SUBSTITUTE = 0
 
-# # decorator for chacking for nan return values
-# import functools
-# def nan_check(function):
-#     @functools.wraps(function)
-#     def nan_check_wrapper(*arg , **kwargs):
-#         function_output = function(*arg , **kwargs)
-#         assert not np.any(pd.isna(function_output)) , f"ERROR::{function.__name__} returns nan at seg {i%16}"
-     
-#         return function_output
-    
-#     return nan_check_wrapper
+PermEn = time_custom(PermEn)
+permutation_entropy = time_custom(permutation_entropy)
+ApEn = time_custom(ApEn)
 
 #TIME DOMAIN
 def shannon_entropy(segment):
-    # Calculate the probability distribution
-    p = np.histogram(segment)[0]
-    p_normalized = p / float(np.sum(p))
-    p_normalized = p_normalized[np.nonzero(p_normalized)]
-    
-    # Compute the Shannon entropy
-    H = entropy(p_normalized, base=2)
-    return H
+    segment_sqred = segment**2
+    return np.sum(segment_sqred * np.log2(segment_sqred))
 
-def symbolize(data, num_levels):
-    min_val = np.min(data)
-    max_val = np.max(data)
-    step_size = (max_val - min_val) / num_levels
+# def symbolize(data, num_levels):
+#     min_val = np.min(data)
+#     max_val = np.max(data)
+#     step_size = (max_val - min_val) / num_levels
     
-    symbols = np.floor((data - min_val) / step_size).astype(int)
-    return symbols
+#     symbols = np.floor((data - min_val) / step_size).astype(int)
+#     return symbols
 
-def permutation_entropy(data, order, num_levels):
-    symbols = symbolize(data, num_levels)
-    patterns = [tuple(symbols[i:i+order]) for i in range(len(symbols) - order + 1)]
-    _, counts = np.unique(patterns, return_counts=True, axis=0)
-    probabilities = counts / len(patterns)
-    entropy_val = -np.sum(probabilities * np.log2(probabilities))
-    return entropy_val
+# def permutation_entropy(data, order, num_levels):
+#     symbols = symbolize(data, num_levels)
+#     patterns = [tuple(symbols[i:i+order]) for i in range(len(symbols) - order + 1)]
+#     _, counts = np.unique(patterns, return_counts=True, axis=0)
+#     probabilities = counts / len(patterns)
+#     entropy_val = -np.sum(probabilities * np.log2(probabilities))
+#     return entropy_val
 
 
 def svd_entropy(data):
@@ -66,35 +60,36 @@ def svd_entropy(data):
     
     return entropy_val
 
-def first_derivative_std(signal):
-    first_derivative = np.gradient(signal)
+def first_derivative_std(segment):
+    first_derivative = np.gradient(segment)
     std_derivative = np.std(first_derivative)
     return std_derivative   
  
-def Hjorth_parameters(signal):
-    first_derivative = np.gradient(signal)
-    signal_hjorth_mobility = np.sqrt(np.var(first_derivative)/np.var(signal))
+def Hjorth_parameters(segment):
+    first_derivative = np.gradient(segment)
+    signal_hjorth_mobility = np.sqrt(np.var(first_derivative)/np.var(segment))
     derivative_hjorth_mobility = np.sqrt(np.var(np.gradient(first_derivative))/np.var(first_derivative))
     hjorth_complexity = derivative_hjorth_mobility/signal_hjorth_mobility
     return signal_hjorth_mobility,hjorth_complexity    
     
-def zero_crossing_rate(signal):
+def zero_crossing_rate(segment):
     zero_crossings = 0
-    for i in range(1, len(signal)):
-        # Check if the signal changes sign
-        if (signal[i] >= 0 and signal[i - 1] < 0) or (signal[i] < 0 and signal[i - 1] >= 0):
+    segment = segment - np.mean(segment)
+    for i in range(1, len(segment)):
+        # Check if the segment changes sign
+        if (segment[i] >= 0 and segment[i - 1] < 0) or (segment[i] < 0 and segment[i - 1] >= 0):
             zero_crossings += 1
     # Return the zero crossing rate
-    return zero_crossings / (len(signal) - 1)   
+    return zero_crossings / (len(segment) - 1)   
 
-def mean_absolute_power(signal):
-    abs_signal = np.abs(signal)
+def mean_absolute_power(segment):
+    abs_signal = np.abs(segment)
     map_signal = np.mean(abs_signal ** 2)
     return map_signal
 
 def rms(segment):
-    rms = np.sqrt(np.mean(segment**2))
-    return rms
+    value = np.sqrt(np.mean(segment**2))
+    return value
 
 def interquartile_range(segment):
     q3, q1 = np.percentile(segment , [75 ,25])
@@ -163,7 +158,7 @@ def statistical(segment : np.ndarray):
     features['min'] = min(segment)
     features['range'] = max(segment) - min(segment)
     features['cov'] = np.std(segment) / np.mean(segment)
-    features['mean_abs_dev'] = np.mean(segment - np.mean(segment))
+    features['mean_abs_dev'] = np.mean(np.abs(segment - np.mean(segment)))
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
     
@@ -172,8 +167,8 @@ def statistical(segment : np.ndarray):
     # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
     # _ , temp, _ = PermEn(segment, m = 5, tau = 1)
     # features['permutation_entropy_EN'] = temp[-1]
-    features['permutation_entropy_EN'] = ordpy.permutation_entropy(segment , dx = 5)
-
+    features['permutation_entropy_EN'] = permutation_entropy(segment , dx = 5, normalized = True)
+    
     temp, _ = ApEn(segment, m = 5, tau = 1)
     features['Approx_entropy_EN'] = temp[-1]
 
