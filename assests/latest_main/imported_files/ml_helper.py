@@ -51,7 +51,7 @@ class Ml_Model():
         
     def k_fold_strat_crossval(self , x_train_data , y_train_data , k_value, rand_state):
         rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
-        result = cross_val_score(self.classifier , x_train_data , y_train_data , cv = rskf , verbose = 1)
+        result = cross_val_score(self.classifier , x_train_data , y_train_data , cv = rskf , verbose = 1,n_jobs = -1)
         print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
         
 

@@ -11,7 +11,7 @@ def on_press(event):
     if event.key == 'escape':
         plt.close()
 
-    elif event.key == 'm':
+    elif event.key in ['m' , 'M']:
         # print("Zoom!!")
         plt.get_current_fig_manager().window.state('zoomed')
 
