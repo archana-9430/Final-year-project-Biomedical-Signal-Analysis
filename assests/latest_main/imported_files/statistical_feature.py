@@ -16,6 +16,7 @@ from scipy import signal
 from scipy.signal import find_peaks
 from scipy.fft import fft
 from ordpy import permutation_entropy
+import pywt
 from EntropyHub import  PermEn ,ApEn , SampEn, K2En, DistEn, DispEn
 
 NAN_SUBSTITUTE = 0
@@ -95,7 +96,6 @@ def interquartile_range(segment):
     q3, q1 = np.percentile(segment , [75 ,25])
     return (q3 - q1)
  
- 
 def extract_rr_intervals(ppg_segment, sampling_rate):
     peaks, _ = find_peaks(ppg_segment, distance=sampling_rate/2)
     # Compute the time differences between consecutive peaks to obtain RR intervals
@@ -123,14 +123,23 @@ def mean_psd(segment, fs):
     and averaging the squared magnitudes of the resulting spectra to obtain the PSD estimate.
     '''
     std_psd = np.std(psd)
-    # mean_psd = np.mean(psd)
+    mean_psd = np.mean(psd)
     #accessing the maximum frequency from the index of the maximum power value in the PSD array
     dominant_frequency = f[np.argmax(psd)]
     # if dominant_frequency == 0:
 
     normalized_psd = psd / np.sum(psd)
     spectral_entropy = -np.sum(normalized_psd * np.log2(normalized_psd))
-    return std_psd, dominant_frequency , spectral_entropy
+    return std_psd, dominant_frequency , spectral_entropy, mean_psd
+
+def boibs(segment):
+    # Compute the FFT
+    fft_result = np.fft.fft(segment)
+
+    peaks, _ = find_peaks(np.abs(fft_result))
+    amplitudes = np.abs(fft_result[peaks])
+    frequencies = np.fft.fftfreq(len(signal))[peaks]
+    return amplitudes, frequencies
 
 def fourier_kurtosis(signal):
     fourier_transform = fft(signal)
@@ -145,7 +154,6 @@ def statistical(segment : np.ndarray):
     features = {}
     
     ''' TIME DOMAIN: '''
-    
     # print(type(segment))
     features['population_std'] = np.std(segment)
     features['sample_std'] = np.std(segment,  ddof=1)
@@ -161,9 +169,15 @@ def statistical(segment : np.ndarray):
     features['mean_abs_dev'] = np.mean(np.abs(segment - np.mean(segment)))
     features['skewness'] = skew(segment)
     features['kurtosis'] = kurtosis(segment)
+    features['first_derivative_std'] = first_derivative_std(segment)
+    features['Hjorth mobility'] , features['Hjorth complexity'] = Hjorth_parameters(segment)
+    features['zero_crossing_rate'] = zero_crossing_rate(segment)#~~
+    features['interquartile_range'] = interquartile_range(segment)
+    features['mean_absolute_power'] = mean_absolute_power(segment)
+    features['rms'] = rms(segment)
+    features['rmssd'] = rmssd(segment)
     
     ''' ENTROPY FEATURES '''
-
     # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
     # _ , temp, _ = PermEn(segment, m = 5, tau = 1)
     # features['permutation_entropy_EN'] = temp[-1]
@@ -183,20 +197,20 @@ def statistical(segment : np.ndarray):
     # features['svd_entropy'] = svd_entropy(segment)
     
     features['Shannon entropy'] = shannon_entropy(segment)#~~
-    features['first_derivative_std'] = first_derivative_std(segment)
-    features['Hjorth mobility'] , features['Hjorth complexity'] = Hjorth_parameters(segment)
-    features['zero_crossing_rate'] = zero_crossing_rate(segment)#~~
-    features['interquartile_range'] = interquartile_range(segment)
-    features['mean_absolute_power'] = mean_absolute_power(segment)
-
-    features['rms'] = rms(segment)
-    features['rmssd'] = rmssd(segment)
 
     ''' FREQUENCY DOMAIN '''
-    features['std_psd'], features['dominant_freq'] , features['spectral_entropy'] = mean_psd(segment, 125)
+    features['std_psd'], features['dominant_freq'] , features['spectral_entropy'], features['mean_psd'] = mean_psd(segment, 125)
     features['fourier_kurtosis'] = fourier_kurtosis(segment)
-    return features
-
-    ''' MORPHOLOGICAL FEATURES '''
+    features['fft_amplitude'], features['fft_frequency'] = boibs(segment)
     
-    ''' DWT FEATURES '''
+    '''DWT features'''
+    cA4, cD4, cD3, cD2, cD1 = pywt.wavedec(segment, 'db1', mode='symmetric', level=4, axis=-1)
+    features['dwt_kurtosis'] = kurtosis(cA4)
+    features['dwt_skew'] = skew(cA4)    
+    features['dwt_mean_absolute_power'] = mean_absolute_power(cA4)    
+    features['dwt_permutation_entropy_EN'] = permutation_entropy(cA4 , dx = 5, normalized = True)
+    temp, _ = ApEn(cA4, m = 5, tau = 1)
+    features['dwt_Approx_entropy_EN'] = temp[-1]
+    features['dwt_Hjorth_mobility'] , features['dwt_Hjorth_complexity'] = Hjorth_parameters(cA4)
+    features['dwt_variance'] = np.var(cA4)
+    return features
