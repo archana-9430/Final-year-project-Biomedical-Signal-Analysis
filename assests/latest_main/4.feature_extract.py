@@ -10,15 +10,10 @@ output_file = stats_features
 
 def store_features(input_train_file, local_features_file):
     df = pd.read_csv(input_train_file, skiprows=2, header=None) 
-
-    import time
-    start = time.perf_counter()
     extracted_features = {col: statistical(df[col].to_numpy(copy = True)) for col in df}
-    elapsed = time.perf_counter() - start
-    print(f"{store_features.__name__} executed in {elapsed:0.2f} seconds.")
     features_df = pd.DataFrame(extracted_features)
     features_df = features_df.T
-    assert not np.any(np.isnan(features_df)) , "ERROR::STORE FEATURES::RETURNS NAN VALUES"
+    assert not features_df.isnull().values.any() , "ERROR::STORE FEATURES::RETURNS NAN VALUES"
     features_df.to_csv(local_features_file, index = False)
     print(features_df)
     
@@ -32,25 +27,34 @@ def merge_all_features(_features_file , _ae_features_file , _all_features_file):
     Merges all the features into a single csv file
     '''
     features_df = pd.read_csv(_features_file)
-    AE_features = pd.read_csv(_ae_features_file)
-    all_features_df = pd.concat([features_df , AE_features] , axis = 1)
+    AE_features_df = pd.read_csv(_ae_features_file)
+
+    if 'annotation' in features_df.columns and 'PatientID' in features_df.columns:
+        features_df.drop(columns=['annotation','PatientID'],inplace=True)
+    if 'annotation' in AE_features_df.columns and 'PatientID' in AE_features_df.columns:
+        AE_features_df.drop(columns=['annotation','PatientID'],inplace=True)
+        
+    all_features_df = pd.concat([features_df , AE_features_df] , axis = 1)
     print(all_features_df)
     all_features_df.to_csv(_all_features_file , index=False)
     
     
-def add_patientID_annotation(annotation_file, feature_file):
+def add_patientID_annotation(annotation_file, target_file):
     '''
-    ADD PATIENT ID AND ANNOTATION TO FINAL FEATURES FILE IN COLUMN_1 and COLUMN_2 respectively
+    ADD PATIENT ID AND ANNOTATION TO FINAL target_file IN COLUMN_0 and COLUMN_1 respectively
     '''
     annotation_row = pd.read_csv(annotation_file, nrows=2, header=None)
-    target_df = pd.read_csv(feature_file)
-    target_df.insert(0, 'annotation', annotation_row.iloc[1])
-    target_df.insert(0, 'PatientID', annotation_row.iloc[0])
-    target_df.to_csv(feature_file, index=False)
+    target_df = pd.read_csv(target_file)
+    if 'annotation' not in target_df.columns and 'PatientID' not in target_df.columns:
+        target_df.insert(0, 'annotation', annotation_row.iloc[1])
+        target_df.insert(0, 'PatientID', annotation_row.iloc[0])
+        target_df.to_csv(target_file, index=False)
 
 def _main_feature_ext():
     store_features(input_file, output_file)
     merge_all_features(stats_features , AE_features , feature_merged)
+    add_patientID_annotation(input_file, AE_features)
+    add_patientID_annotation(input_file, stats_features)
     add_patientID_annotation(input_file, feature_merged)
 
 if __name__ == "__main__":

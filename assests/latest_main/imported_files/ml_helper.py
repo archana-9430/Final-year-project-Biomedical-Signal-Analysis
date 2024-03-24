@@ -33,7 +33,7 @@ RandomForestClassifier = _pass_to_function(RandomForestClassifier)
 DecisionTreeClassifier = _pass_to_function(DecisionTreeClassifier)
 SVC = _pass_to_function(SVC)
 GaussianNB = _pass_to_function(GaussianNB)
-class Ml_Model():
+class Ml_helper():
     '''
     * This class provides unified interface to Random forest, Decision Tree, SVM and Gaussian Naive Bayes
     * Just pass the name and it will create that classifier using sklearn library
@@ -59,12 +59,12 @@ class Ml_Model():
 
         # Now TESTING the model and showing the results:
         # confusion matrix 
-        test_pred = self.classifier.predict(x_test_data)
-        confu_mtrx= confusion_matrix(y_test_data , test_pred)
+        self.test_pred = self.classifier.predict(x_test_data)
+        self.confu_mtrx= confusion_matrix(y_test_data , self.test_pred)
         class_list = unique(y_test_data)
         ax = plt.axes()
         set_theme(font_scale=1.3)
-        heatmap(confu_mtrx, annot = True , fmt = "g" , ax = ax , cmap = "magma")
+        heatmap(self.confu_mtrx, annot = True , fmt = "g" , ax = ax , cmap = "magma")
         ax.set_title(f'Confusion Matrix - {self.model_name}: {description}')
         ax.set_xlabel("Predicted label" , fontsize = 15)
         ax.set_xticklabels(class_list)
@@ -79,10 +79,12 @@ class Ml_Model():
             plt.show()
 
         # classification report
-        print(f"Confu mtrx = \n{confu_mtrx}")
+        print(f"Confu mtrx = \n{self.confu_mtrx}")
         print("\nClassification Report:\n")
-        print(classification_report(y_test_data, test_pred))
+        print(classification_report(y_test_data, self.test_pred))
         print("\nAvg score on test dataset = {}".format(self.classifier.score(x_test_data , y_test_data)))
         print(self.classifier)
 
-        return test_pred
+        return self.test_pred
+    
+         

@@ -2,8 +2,6 @@ from imported_files.paths_n_vars import features_file, intra_annotated_file, all
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 10
-split_criteria = "entropy"
 
 # k of k flod cross validation
 k = 5 # change if you want to experiment
