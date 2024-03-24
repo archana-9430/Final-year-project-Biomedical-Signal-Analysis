@@ -8,7 +8,13 @@ and then puts all the files in a single folder specified by global variable "out
 from imported_files.paths_n_vars import  filtered_merged, annotated_merged, sampling_frequency
 
 input_path = annotated_merged
-output_folder = filtered_merged
+output_path = filtered_merged
+
+#SNR
+# input_path = "SNR_data/clean_noise.csv"
+# output_path = "SNR_data/filtering_butter.csv"
+
+output_folder = "5.all_filter_merged"
 
 # filter specifications
 filter_order = 4
@@ -45,6 +51,7 @@ class Filter():
         anno_filt = np.insert(filtered_data,0,values=annotation.values , axis = 0)
         merged_df = pd.DataFrame(data = anno_filt , columns = df.columns)
         merged_df.to_csv(filtered_data_file_path , index = False)
+        
                
 
 def _main_filtering():
@@ -53,7 +60,7 @@ def _main_filtering():
                             sampling_freq, 
                             lower_cutoff, 
                             higher_cutoff)
-    ppg_filter.butterworth_bp_filter(input_path, output_folder)
+    ppg_filter.butterworth_bp_filter(input_path, output_path)
 
 
 if __name__ == "__main__":
