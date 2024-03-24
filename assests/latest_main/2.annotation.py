@@ -68,9 +68,8 @@ def annotator(segmented_file_path , annotated_file_path):
 
         # next segment
         i += 1
-
-def _main_annotation(local_input_folder , local_output_folder):
-    # Get the list of all files and directories
+def annotate(local_input_folder,local_output_folder):
+     # Get the list of all files and directories
     file_list = os.listdir(local_input_folder)
     pprint(f"{file_list}, {len(file_list)}")
     # for csv_file in file_list:
@@ -82,10 +81,14 @@ def _main_annotation(local_input_folder , local_output_folder):
             annotator(f"{local_input_folder}/{csv_file}",
                     f"{local_output_folder}/{csv_file}"
                     )
+            
+def _main_annotation(local_input_folder , local_output_folder):
+    # annotate(local_input_folder , local_output_folder)
+    merge_csv("3.annotated_data", annotated_merged)
+
 
 if __name__ == "__main__":
 
     _main_annotation(input_folder , output_folder)
-    merge_csv("3.annotated_data", annotated_merged)
 
     

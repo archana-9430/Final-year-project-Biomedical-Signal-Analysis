@@ -67,9 +67,9 @@ def rf_model_function( local_features_file , description : str = ""):
         print('number of patients = ',len(unique_patients))
         dataset = pd.read_csv('annotated_merged.csv')
 
-        dataset[[x[0] for x in classification_rep if x[2] == 0] ].to_csv(path_or_buf = 'Stage_2/clean.csv',index = False)
-        dataset[[x[0] for x in classification_rep if x[2] == 1] ].to_csv(path_or_buf = 'Stage_2/partly_corrupted.csv',index = False)
-        dataset[[x[0] for x in classification_rep if x[2] == 2] ].to_csv(path_or_buf = 'Stage_2/corrupted.csv',index = False)
+        dataset[[x[0] for x in classification_rep if x[2] == 0] ].to_csv(path_or_buf = 'Stage_2/rf/clean.csv',index = False)
+        dataset[[x[0] for x in classification_rep if x[2] == 1] ].to_csv(path_or_buf = 'Stage_2/rf/partly_corrupted.csv',index = False)
+        dataset[[x[0] for x in classification_rep if x[2] == 2] ].to_csv(path_or_buf = 'Stage_2/rf/corrupted.csv',index = False)
 
 
         allMissClassifications = [x for x in classification_rep if x[1] != x[2]] # x[1] -> true labels :: x[2] -> predicted labels
@@ -80,7 +80,7 @@ def rf_model_function( local_features_file , description : str = ""):
                 temp = [x[0] for x in allMissClassifications if ((x[1] == i) and (x[2] == j))] 
                 if len(temp) > 0:
                     innerList.append(temp)
-                    dataset[temp].to_csv(path_or_buf = f'4.missclassifications/missclassification_Of_{i}_to_{j}.csv',index = False)
+                    dataset[temp].to_csv(path_or_buf = f'4.missclassifications/rf/{description}_{i}_to_{j}.csv',index = False)
             missClasslist.append(innerList)
                 
     else:
