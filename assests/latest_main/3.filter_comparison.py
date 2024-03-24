@@ -3,22 +3,32 @@ Signal-to-Noise Ratio (SNR)
 Mean Squared Error (MSE)
 Root Mean Squared Error (RMSE)
 Peak Signal-to-Noise Ratio (PSNR)
+PCC
+SF
 '''
 
 clean_signal = "SNR_data/clean_merged.csv"
-# filtered_signal = "SNR_data/butter.csv"
+
+clean_plus_noise = "SNR_data/clean_noise.csv"
+
+# filtered_signal = "SNR_data/butter.csv
 # filtered_signal = "SNR_data/cheby1.csv"
 # filtered_signal = "SNR_data/cheby2.csv"
 filtered_signal = "SNR_data/ellip.csv"
+
 noise = "SNR_data/noise_seg_merged.csv"
 
 import numpy as np
 import pandas as pd
+import math
 
 def snr_improvement(clean_segment, filtered_segment, noise):
     # print("clean_segment.shape", clean_segment.shape, " filtered_segment.shape ", filtered_segment.shape)
     assert clean_segment.shape == filtered_segment.shape, "Clean and filtered segments must have the same shape"
-    snr_improvement = (np.mean(clean_segment**2) / ((np.mean(filtered_segment**2)) - (np.mean(clean_segment**2)))) - (np.mean(clean_segment**2) / np.mean(noise**2))
+    snr_input = np.mean(clean_segment**2) / np.mean(noise**2)
+    snr_output = np.mean(clean_segment**2) / (np.mean((filtered_segment - clean_segment)**2))
+    # print("snr_input", snr_input, "snr_output", snr_output)
+    snr_improvement = 10 * math.log10(snr_output) - 10 * math.log10(snr_input)  
     return snr_improvement
 
 def calculate_snr(signal, noise):
@@ -71,7 +81,8 @@ def calculate_sf(original_signal, filtered_signal):
 
 
 # Read the CSV files for signal and filtered signal
-signal_data = pd.read_csv(clean_signal, skiprows=1)
+clean_data = pd.read_csv(clean_signal, skiprows=1)
+clean_plus_noise_data = pd.read_csv(clean_plus_noise)
 filtered_signal_data = pd.read_csv(filtered_signal)
 noise_data = pd.read_csv(noise)
 
@@ -80,7 +91,7 @@ noise_data = pd.read_csv(noise)
 # print("noise_data", noise_data)
 
 # Assuming data is organized in columns and both CSV files have the same number of columns
-num_columns = len(signal_data.columns)
+num_columns = len(clean_data.columns)
 snr_values = []
 ncc_values = []
 rmse_values = []
@@ -92,38 +103,36 @@ sf_values = []
 
 for i in range(num_columns):
     # Extract data from corresponding columns in both files
-    signal_segment = signal_data.iloc[:, i]
+    clean_segment = clean_data.iloc[:, i]
     filtered_signal_segment = filtered_signal_data.iloc[:, i]
     # noise_index = i % noise_len
     # noise_segment = noise_data.iloc[:, noise_index]
-    noise_segment = noise_data.iloc[:, i]
-    
-    # print("i: ", i)
-    # print("signal_segment", signal_segment)
+    clean_noise = clean_plus_noise_data.iloc[:, i]
+    noise_segment = 0.0002 * noise_data.iloc[:, i]
     
     # Calculate SNR
-    snr = snr_improvement(signal_segment, filtered_signal_segment, noise_segment)
+    snr = snr_improvement(clean_segment, filtered_signal_segment, noise_segment)
     # print("snr", snr)
     snr_values.append(snr)
     
     # Calculate MSE
-    mse = calculate_mse(signal_segment, filtered_signal_segment)
+    mse = calculate_mse(clean_segment, filtered_signal_segment)
     mse_values.append(mse)
     
     # Calculate RMSE
-    rmse = calculate_rmse(signal_segment, filtered_signal_segment)
+    rmse = calculate_rmse(clean_segment, filtered_signal_segment)
     rmse_values.append(rmse)
     
     # Calculate PSNR
-    psnr = calculate_psnr(signal_segment, filtered_signal_segment)
+    psnr = calculate_psnr(clean_segment, filtered_signal_segment)
     psnr_values.append(psnr)
     
     # Calculate NCC
-    ncc = calculate_ncc(signal_segment, filtered_signal_segment)
+    ncc = calculate_ncc(clean_segment, filtered_signal_segment)
     ncc_values.append(ncc)
     
     # Calculate SF: Smoothness factor
-    sf = calculate_sf(signal_segment, filtered_signal_segment)
+    sf = calculate_sf(clean_segment, filtered_signal_segment)
     sf_values.append(sf)
 
 mean_snr = np.mean(snr_values)
@@ -140,10 +149,6 @@ print("Mean MSE:", mean_mse)
 print("Mean PSNR:", mean_psnr)
 print("Mean SF:", mean_sf)
 
-# snr = calculate_snr(original_signal, noise)
-# mse = calculate_mse(original_signal, filtered_signal)
-# rmse = calculate_rmse(original_signal, filtered_signal)
-# psnr = calculate_psnr(original_signal, filtered_signal)
-# pcc = ncc(original_signal, filtered_signal)
-# sf = calculate_sf(original_signal, filtered_signal)
+'''The high values of NCC, PSNR, and SF suggest that the filtered signal retains the structural and
+visual characteristics of the original signal fairly well'''
 
