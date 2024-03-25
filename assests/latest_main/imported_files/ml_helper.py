@@ -40,6 +40,8 @@ class Ml_helper():
     '''
     def __init__(self, _ml_model_name: str, **kwargs_custom):
         self.model_name = _ml_model_name
+        self.test_pred = 0
+        self.confu_mtrx = None
         if _ml_model_name in ['RF' , 'rf' , 'Random Forest' , 'random forest']:
             self.classifier = RandomForestClassifier(**kwargs_custom)
         elif _ml_model_name in ['DT' , 'dt' , 'Decision Tree' , 'decision tree']:
@@ -50,9 +52,12 @@ class Ml_helper():
             self.classifier = GaussianNB(**kwargs_custom)
         
     def k_fold_strat_crossval(self , x_train_data , y_train_data , k_value, rand_state):
+        print('_'*50)
+        print('CV STARTS')
         rskf = RepeatedStratifiedKFold(n_splits = k_value , n_repeats = k_value , random_state = rand_state)
-        result = cross_val_score(self.classifier , x_train_data , y_train_data , cv = rskf , verbose = 1,n_jobs = -1)
+        result = cross_val_score(self.classifier , x_train_data , y_train_data , cv = rskf ,n_jobs = -1)
         print("Cross validation Accuracy : mean = {} :: std = {}".format(result.mean() , result.std()))
+        print('CV ENDS')
         
 
     def test_n_results(self, x_test_data , y_test_data, description:str = ""):
@@ -79,6 +84,8 @@ class Ml_helper():
             plt.show()
 
         # classification report
+        print('_'*50)
+        print('TEST RESULTS')
         print(f"Confu mtrx = \n{self.confu_mtrx}")
         print("\nClassification Report:\n")
         print(classification_report(y_test_data, self.test_pred))

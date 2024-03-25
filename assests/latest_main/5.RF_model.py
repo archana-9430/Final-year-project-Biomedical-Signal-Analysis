@@ -1,14 +1,15 @@
-from imported_files.paths_n_vars import stats_features, filtered_merged, feature_merged
+from imported_files.paths_n_vars import stats_features, filtered_merged, feature_merged, AE_features
 from imported_files.ml_helper import Ml_helper
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 15
+num_trees = 50
 split_criteria = "gini"
 
 # k of k fold cross validation
 k = 9 # change if you want to experiment
-
 # class list
 # class_list = ["0" , "1"] # good segn = 0 , corrupted signal = 1
 
@@ -21,22 +22,45 @@ from sklearn.model_selection import train_test_split
 from collections import Counter
 # ~~~~~~~~~~~~END LIBRARIES~~~~~~~~~~~~~~~~~~~~~
 
+def miss_class_report(fil_mer_path, pID , y_test, y_pred, description):
+    allMissClassifications = []
+    missClasslist = []
+    filtered_m_df = pd.read_csv(fil_mer_path)
+    # identifying miss-classisfied segments and saving them
+    classification_rep = tuple(zip(pID , y_test.values , y_pred))
+    unique_patients = np.unique( [x.split('_')[0] for x in pID])
+    print('_'*50)
+    print('IDENTIFYING MISSCLASSIFICATIONS')
+    print('number of patients = ',len(unique_patients))
+    for u_p in unique_patients:
+        filtered_m_df[[x[0] for x in classification_rep if x[2] == 0 and x[0].split('_')[0] == u_p]].to_csv(path_or_buf = 'Stage_2/rf/model_prediction/clean/patient_'+ u_p +'.csv',index = False)
+        filtered_m_df[[x[0] for x in classification_rep if x[2] == 1 and x[0].split('_')[0] == u_p]].to_csv(path_or_buf = 'Stage_2/rf/model_prediction/partly_corrupted/patient_'+ u_p +'.csv',index = False)
+        filtered_m_df[[x[0] for x in classification_rep if x[2] == 2 and x[0].split('_')[0] == u_p]].to_csv(path_or_buf = 'Stage_2/rf/model_prediction/corrupted/patient_'+ u_p +'.csv',index = False)
+
+
+    allMissClassifications = [x for x in classification_rep if x[1] != x[2]] # x[1] -> true labels :: x[2] -> predicted labels
+    class_list = np.unique(y_test)
+    for i in range(len(class_list)):
+        innerList = []
+        for j in range(len(class_list)):
+            temp = [x[0] for x in allMissClassifications if ((x[1] == i) and (x[2] == j))] 
+            if len(temp) > 0:
+                innerList.append(temp)
+                filtered_m_df[temp].to_csv(path_or_buf = f'4.missclassifications/rf/{description}_{i}_to_{j}.csv',index = False)
+        missClasslist.append(innerList)
+    return np.array(allMissClassifications) , missClasslist
+
 def rf_model_function( local_features_file , description : str = ""):
     # get the dataset from the files
     features_df = pd.read_csv(local_features_file)
     labels = features_df['annotation'] # this will exract the annotation 2nd row    
-    class_list = np.unique(labels)
-        
-    if 'annotation' in features_df.columns :
-        features_df.drop(['annotation'] , axis = 'columns' , inplace = True)
+    unanno_df = features_df.drop(['annotation'] , axis = 'columns')
 
-    assert not 'annotation' in features_df.columns
+    assert not 'annotation' in unanno_df.columns
 
-    features_train, features_test, y_train, y_test = train_test_split(features_df, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
+    features_train, features_test, y_train, y_test = train_test_split(unanno_df, labels, test_size = test_fraction, random_state = rand_state, stratify = labels)
 
     if 'PatientID' in features_df.columns:
-        pID_train = features_train['PatientID']
-        pID_test = features_test['PatientID']
         x_train = features_train.drop(['PatientID'] , axis = 'columns')
         x_test = features_test.drop(['PatientID'] , axis = 'columns')
 
@@ -53,58 +77,55 @@ def rf_model_function( local_features_file , description : str = ""):
     assert not ('annotation' in x_train.columns or 'PatientID' in x_train.columns)
     # create and train classifier
     rf_model = Ml_helper('rf' , n_estimators = num_trees , random_state = rand_state \
-                                  , criterion = split_criteria, verbose = 1)
+                                  , criterion = split_criteria, n_jobs = -1)
+    
+    # # hyper parameter tuning
+    # print('Hyper parameter tuning starts')    
+    # param_grid = { 
+    # 'n_estimators': range(5,151,5),
+    # 'max_features': ['sqrt', 'log2'],
+    # 'criterion': ['gini','entropy'],
+    # 'max_depth':range(5,21,5)
+    # }
+    # cv_rf = GridSearchCV(rf_model.classifier, param_grid, n_jobs=-1, cv=5, refit=True)
+    # cv_rf.fit(x_train,y_train)
+    # print(cv_rf.best_params_)
+    # rf_model.classifier = cv_rf.best_estimator_
+    # # tuning ends
+
     rf_model.classifier.fit(x_train , y_train)
     rf_model.k_fold_strat_crossval(x_train , y_train , k , rand_state)
     y_pred = rf_model.test_n_results(x_test , y_test , description)
     
-    allMissClassifications = []
-    missClasslist = []
+    
     if 'PatientID' in features_df.columns:
-        # identifying miss-classisfied segments and saving them
-        classification_rep = tuple(zip(pID_test.values , y_test.values , y_pred))
-        unique_patients = np.unique( [x.split('_')[0] for x in pID_test.values])
-        print('number of patients = ',len(unique_patients))
-        dataset = pd.read_csv('annotated_merged.csv')
+        return miss_class_report(filtered_merged, features_test['PatientID'].values, y_test, y_pred, description)
+    
+    print('Patient ID not given so cannot identify missclassified patients...')
+    return None
 
-        dataset[[x[0] for x in classification_rep if x[2] == 0] ].to_csv(path_or_buf = 'Stage_2/rf/clean.csv',index = False)
-        dataset[[x[0] for x in classification_rep if x[2] == 1] ].to_csv(path_or_buf = 'Stage_2/rf/partly_corrupted.csv',index = False)
-        dataset[[x[0] for x in classification_rep if x[2] == 2] ].to_csv(path_or_buf = 'Stage_2/rf/corrupted.csv',index = False)
-
-
-        allMissClassifications = [x for x in classification_rep if x[1] != x[2]] # x[1] -> true labels :: x[2] -> predicted labels
-        
-        for i in range(len(class_list)):
-            innerList = []
-            for j in range(len(class_list)):
-                temp = [x[0] for x in allMissClassifications if ((x[1] == i) and (x[2] == j))] 
-                if len(temp) > 0:
-                    innerList.append(temp)
-                    dataset[temp].to_csv(path_or_buf = f'4.missclassifications/rf/{description}_{i}_to_{j}.csv',index = False)
-            missClasslist.append(innerList)
-                
-    else:
-        print('Patient ID not given so cannot identify missclassified patients...')
-        missClasslist = None
-
-    return np.array(allMissClassifications) , missClasslist
     
 print("\n~~~~~ RF:: W/O AE FEATURES ~~~~~")
-list_stats , stat_miss_class = rf_model_function(stats_features, description = "Statistical features")
+(list_stats , stat_miss_class) = rf_model_function(stats_features, description = "Statistical features")
 
-print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
-list_all , all_miss_class = rf_model_function(feature_merged, description = "All features")
-# for i in range(len(list_all)):
-#     if len(list_all[i]):
-#         for x in list_all[i]:
-#             if x not in list_stats[i]:
-#                 print(x)
-only_ae = []
-for x in list_all:
-    if x[0] not in list_stats[:,0]:
-        only_ae.append(x.tolist())
+# print("\n~~~~~ RF:: ONLY AE FEATURES ~~~~~")
+# list_all , all_miss_class = rf_model_function(AE_features, description = "AE features")
+
+# print("\n~~~~~ RF:: WITH ALL FEATURES ~~~~~")
+# list_all , all_miss_class = rf_model_function(feature_merged, description = "All features")
+
+
+# # for i in range(len(list_all)):
+# #     if len(list_all[i]):
+# #         for x in list_all[i]:
+# #             if x not in list_stats[i]:
+# #                 print(x)
+# only_ae = []
+# for x in list_all:
+#     if x[0] not in list_stats[:,0]:
+#         only_ae.append(x.tolist())
     
 # print(f'{only_ae = }')
 print(f'{list_stats.shape = }')
-print(f'{list_all.shape = }')
-print(f'{len(only_ae) = }')
+# print(f'{list_all.shape = }')
+# print(f'{len(only_ae) = }')
