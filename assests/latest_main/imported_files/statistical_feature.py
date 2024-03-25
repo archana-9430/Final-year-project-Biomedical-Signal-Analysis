@@ -30,7 +30,7 @@ ApEn = time_custom(ApEn)
 def shannon_entropy(segment):
 #     segment_sqred = segment**2
 #     return np.sum(segment_sqred * np.log2(segment_sqred))
-    p_signal = np.abs(signal) / np.sum(np.abs(signal))  # Calculate probability distribution
+    p_signal = np.abs(segment) / np.sum(np.abs(segment))  # Calculate probability distribution
     sh_entropy = -np.sum(p_signal * np.log2(p_signal))  # Calculate Shannon entropy
     return sh_entropy
 
