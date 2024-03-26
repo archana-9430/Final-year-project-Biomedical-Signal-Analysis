@@ -150,7 +150,7 @@ def statistical(segment : np.ndarray):
     '''
     features = {}
     
-    ''' TIME DOMAIN: '''
+    ''' TIME DOMAIN: 28'''
     # print(type(segment))
     features['mean'] = np.mean(segment)
     features['median'] = np.percentile(segment, 50)
@@ -182,7 +182,7 @@ def statistical(segment : np.ndarray):
     features['Hjorth mobility'] , features['Hjorth complexity'] = Hjorth_parameters(segment)
     features['rmssd'] = rmssd(segment)
    
-    ''' FREQUENCY DOMAIN '''
+    ''' FREQUENCY DOMAIN: 11'''
     f, psd = signal.welch(segment, fs=125)
     '''Welch's method: Divide the signal into overlapping segments,
     computing the Fourier transform of each segment,
@@ -195,30 +195,29 @@ def statistical(segment : np.ndarray):
     features['mean_psd'] = np.mean(psd)
     features['dominant_frequency'] = f[np.argmax(psd)]
     features['total_power'] = np.sum(psd)
-    features['normalized_psd'] = psd / np.sum(psd)
+    # features['normalized_psd'] = psd / np.sum(psd) #---
     features['spectral_entropy'] = -np.sum(psd / np.sum(psd) * np.log2(psd / np.sum(psd)))
-    features['normalized_psd'] = psd / np.sum(psd)
+    features['normalized_psd'] = np.mean(psd / np.sum(psd))
     features['spectral_centroid'] = np.sum(f * psd) / np.sum(psd)
     features['spectral_flatness'] = geometric_mean / arithmetic_mean
     features['spectral_skewness'] = skew(psd)
-    features['spectral_kurtosis'] = kurtosis(psd)
     features['spectral_kurtosis'] = kurtosis(psd)
     features['fourier_kurtosis'] = fourier_kurtosis(segment)
     # features['fft_amplitude'], features['fft_frequency'] = boibs(segment)
     
 
-    ''' ENTROPY FEATURES '''
+    ''' ENTROPY FEATURES: 4'''
     temp , _ , _ = SampEn(segment, m = 5, tau = 1)
     features['Sample_entropy_EN'] = temp[-1]
     
     temp, _ = ApEn(segment, m = 5, tau = 1)
     features['Approx_entropy_EN'] = temp[-1]
     
-    features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
-    _ , temp, _ = PermEn(segment, m = 5, tau = 1)
+    # features['permutation_entropy'] = permutation_entropy(segment, 3, 10)
+    # _ , temp, _ = PermEn(segment, m = 5, tau = 1)
     
     # features['permutation_entropy_EN'] = temp[-1]
-    # features['permutation_entropy_EN'] = permutation_entropy(segment , dx = 5, normalized = True)
+    features['permutation_entropy_EN'] = permutation_entropy(segment , dx = 5, normalized = True)
     
     features['Shannon entropy'] = shannon_entropy(segment)
     
@@ -228,14 +227,13 @@ def statistical(segment : np.ndarray):
     # features['Distribution_entropy_EN'] , _ = DistEn(segment, m = 3, tau = 1)1
 
     # features['svd_entropy'] = svd_entropy(segment)
-
     
-    '''DWT features'''
+    '''DWT features: 26'''
     cA4, cD4, cD3, cD2, cD1 = pywt.wavedec(segment, 'db1', mode='symmetric', level=4, axis=-1)
-    features['cA4'] = cA4
-    features['cD4'] = cD4
-    features['cD3'] = cD3
-    features['cD2'] = cD2
+    features['cA4'] = np.mean(cA4) #---
+    features['cD4'] = np.mean(cD4) #---
+    features['cD3'] = np.mean(cD3) #---
+    features['cD2'] = np.mean(cD2) #---
     features['dwt_kurtosis'] = kurtosis(cA4)
     features['dwt_skew'] = skew(cA4)    
     features['dwt_mean_absolute_power'] = mean_absolute_power(cA4)    
@@ -244,109 +242,109 @@ def statistical(segment : np.ndarray):
     features['dwt_Approx_entropy_EN'] = temp[-1]
     features['dwt_Hjorth_mobility'] , features['dwt_Hjorth_complexity'] = Hjorth_parameters(cA4)
     features['dwt_variance'] = np.var(cA4)
-    features['population_std'] = np.std(cA4)
-    features['sample_std'] = np.std(cA4,  ddof=1)
-    features['variance'] = np.std(cA4) ** 2
-    features['mean'] = np.mean(cA4)
-    features['median'] = np.percentile(cA4, 50)
-    features['q1'] = np.percentile(cA4, 25)
-    features['q3'] = np.percentile(cA4, 75)
-    features['max'] = max(cA4)
-    features['min'] = min(cA4)
-    features['range'] = max(cA4) - min(cA4)
-    features['cov'] = np.std(cA4) / np.mean(cA4)
-    features['mean_abs_dev'] = np.mean(np.abs(cA4 - np.mean(cA4)))
-    features['skewness'] = skew(cA4)
-    features['kurtosis'] = kurtosis(cA4)
-    features['first_derivative_std'] = first_derivative_std(cA4)
-    features['Hjorth mobility'] , features['Hjorth complexity'] = Hjorth_parameters(cA4)
-    features['zero_crossing_rate'] = zero_crossing_rate(cA4)#~~
-    features['interquartile_range'] = interquartile_range(cA4)
-    features['mean_absolute_power'] = mean_absolute_power(cA4)
-    features['rms'] = rms(cA4)
-    features['rmssd'] = rmssd(cA4)
+    features['dwt_population_std'] = np.std(cA4)
+    features['dwt_sample_std'] = np.std(cA4,  ddof=1)
+    features['dwt_variance'] = np.std(cA4) ** 2
+    features['dwt_mean'] = np.mean(cA4)
+    features['dwt_median'] = np.percentile(cA4, 50)
+    features['dwt_q1'] = np.percentile(cA4, 25)
+    features['dwt_q3'] = np.percentile(cA4, 75)
+    features['dwt_max'] = max(cA4)
+    features['dwt_min'] = min(cA4)
+    features['dwt_range'] = max(cA4) - min(cA4)
+    features['dwt_cov'] = np.std(cA4) / np.mean(cA4)
+    features['dwt_mean_abs_dev'] = np.mean(np.abs(cA4 - np.mean(cA4)))
+    features['dwt_skewness'] = skew(cA4)
+    features['dwt_kurtosis'] = kurtosis(cA4)
+    features['dwt_first_derivative_std'] = first_derivative_std(cA4)
+    features['dwt_Hjorth mobility'] , features['dwt_Hjorth complexity'] = Hjorth_parameters(cA4)
+    features['dwt_zero_crossing_rate'] = zero_crossing_rate(cA4)#~~
+    features['dwt_interquartile_range'] = interquartile_range(cA4)
+    features['dwt_mean_absolute_power'] = mean_absolute_power(cA4)
+    features['dwt_rms'] = rms(cA4)
+    # features['dwt_rmssd'] = rmssd(cA4)
     
     
-    #DWT of first derivative
+    #DWT of first derivative: 26
     first_derivative = np.gradient(segment)
     cA4_d, cD4, cD3, cD2, cD1 = pywt.wavedec(first_derivative, 'db1', mode='symmetric', level=4, axis=-1)
-    features['dwt_kurtosis_d'] = kurtosis(cA4_d)
-    features['dwt_skew_d'] = skew(cA4_d)    
-    features['dwt_mean_absolute_power_d'] = mean_absolute_power(cA4_d)    
-    features['dwt_permutation_entropy_EN_d'] = permutation_entropy(cA4_d , dx = 5, normalized = True)
+    features['dwt1_kurtosis'] = kurtosis(cA4_d)
+    features['dwt1_skew'] = skew(cA4_d)    
+    features['dwt1_mean_absolute_power'] = mean_absolute_power(cA4_d)    
+    features['dwt1_permutation_entropy_EN'] = permutation_entropy(cA4_d , dx = 5, normalized = True)
     temp, _ = ApEn(cA4_d, m = 5, tau = 1)
-    features['dwt_Approx_entropy_EN_d'] = temp[-1]
-    features['dwt_Hjorth_mobility_d'] , features['dwt_Hjorth_complexity_d'] = Hjorth_parameters(cA4_d)
-    features['dwt_variance_d'] = np.var(cA4_d)
-    features['population_std_d'] = np.std(cA4_d)
-    features['sample_std_d'] = np.std(cA4_d,  ddof=1)
-    features['variance_d'] = np.std(cA4_d) ** 2
-    features['mean_d'] = np.mean(cA4_d)
-    features['median_d'] = np.percentile(cA4_d, 50)
-    features['q1_d'] = np.percentile(cA4_d, 25)
-    features['q3_d'] = np.percentile(cA4_d, 75)
-    features['max_d'] = max(cA4_d)
-    features['min_d'] = min(cA4_d)
-    features['range_d'] = max(cA4_d) - min(cA4_d)
-    features['cov_d'] = np.std(cA4_d) / np.mean(cA4_d)
-    features['mean_abs_dev_d'] = np.mean(np.abs(cA4_d - np.mean(cA4_d)))
-    features['skewness_d'] = skew(cA4_d)
-    features['kurtosis_d'] = kurtosis(cA4_d)
-    features['first_derivative_std_d'] = first_derivative_std(cA4_d)
-    features['Hjorth mobility_d'] , features['Hjorth complexity_d'] = Hjorth_parameters(cA4_d)
-    features['zero_crossing_rate_d'] = zero_crossing_rate(cA4_d)#~~
-    features['interquartile_range_d'] = interquartile_range(cA4_d)
-    features['mean_absolute_power_d'] = mean_absolute_power(cA4_d)
-    features['rms_d'] = rms(cA4_d)
-    features['rmssd_d'] = rmssd(cA4_d)
+    features['dwt1_Approx_entropy_EN'] = temp[-1]
+    features['dwt1_Hjorth_mobility'] , features['dwt1_Hjorth_complexity'] = Hjorth_parameters(cA4_d)
+    features['dwt1_variance'] = np.var(cA4_d)
+    features['dwt1_population_std'] = np.std(cA4_d)
+    features['dwt1_sample_std'] = np.std(cA4_d,  ddof=1)
+    features['dwt1_variance'] = np.std(cA4_d) ** 2
+    features['dwt1_mean'] = np.mean(cA4_d)
+    features['dwt1_median'] = np.percentile(cA4_d, 50)
+    features['dwt1_q1'] = np.percentile(cA4_d, 25)
+    features['dwt1_q3'] = np.percentile(cA4_d, 75)
+    features['dwt1_max'] = max(cA4_d)
+    features['dwt1_min'] = min(cA4_d)
+    features['dwt1_range'] = max(cA4_d) - min(cA4_d)
+    features['dwt1_cov'] = np.std(cA4_d) / np.mean(cA4_d)
+    features['dwt1_mean_abs_dev'] = np.mean(np.abs(cA4_d - np.mean(cA4_d)))
+    features['dwt1_skewness'] = skew(cA4_d)
+    features['dwt1_kurtosis'] = kurtosis(cA4_d)
+    features['dwt1_first_derivative_std'] = first_derivative_std(cA4_d)
+    features['dwt1_Hjorth mobility'] , features['dwt1_Hjorth complexity'] = Hjorth_parameters(cA4_d)
+    features['dwt1_zero_crossing_rate'] = zero_crossing_rate(cA4_d)#~~
+    features['dwt1_interquartile_range'] = interquartile_range(cA4_d)
+    features['dwt1_mean_absolute_power'] = mean_absolute_power(cA4_d)
+    features['dwt1_rms'] = rms(cA4_d)
+    # features['dwt1_rmssd'] = rmssd(cA4_d)
     
     
-    #DWT of second derivative
+    #DWT of second derivative: 26
     second_derivative = np.gradient(segment)
     cA4_d2, cD4, cD3, cD2, cD1 = pywt.wavedec(second_derivative, 'db1', mode='symmetric', level=4, axis=-1)
-    features['dwt_kurtosis_d2'] = kurtosis(cA4_d2)
-    features['dwt_skew_d2'] = skew(cA4_d2)    
-    features['dwt_mean_absolute_power_d2'] = mean_absolute_power(cA4_d2)    
-    features['dwt_permutation_entropy_EN_d2'] = permutation_entropy(cA4_d2 , dx = 5, normalized = True)
+    features['dwt2_kurtosis'] = kurtosis(cA4_d2)
+    features['dwt2_skew'] = skew(cA4_d2)    
+    features['dwt2_mean_absolute_power'] = mean_absolute_power(cA4_d2)    
+    features['dwt2_permutation_entropy_EN'] = permutation_entropy(cA4_d2 , dx = 5, normalized = True)
     temp, _ = ApEn(cA4_d2, m = 5, tau = 1)
-    features['dwt_Approx_entropy_EN_d2'] = temp[-1]
-    features['dwt_Hjorth_mobility_d2'] , features['dwt_Hjorth_complexity_d2'] = Hjorth_parameters(cA4_d2)
-    features['dwt_variance_d2'] = np.var(cA4_d2)
-    features['population_std_d2'] = np.std(cA4_d2)
-    features['sample_std_d2'] = np.std(cA4_d2,  ddof=1)
-    features['variance_d2'] = np.std(cA4_d2) ** 2
-    features['mean_d2'] = np.mean(cA4_d2)
-    features['median_d2'] = np.percentile(cA4_d2, 50)
-    features['q1_d2'] = np.percentile(cA4_d2, 25)
-    features['q3_d2'] = np.percentile(cA4_d2, 75)
-    features['max_d2'] = max(cA4_d2)
-    features['min_d2'] = min(cA4_d2)
-    features['range_d2'] = max(cA4_d2) - min(cA4_d2)
-    features['cov_d2'] = np.std(cA4_d2) / np.mean(cA4_d2)
-    features['mean_abs_dev_d2'] = np.mean(np.abs(cA4_d2 - np.mean(cA4_d2)))
-    features['skewness_d2'] = skew(cA4_d2)
-    features['kurtosis_d2'] = kurtosis(cA4_d2)
-    features['first_derivative_std_d2'] = first_derivative_std(cA4_d2)
-    features['Hjorth mobility_d2'] , features['Hjorth complexity_d2'] = Hjorth_parameters(cA4_d2)
-    features['zero_crossing_rate_d2'] = zero_crossing_rate(cA4_d2)#~~
-    features['interquartile_range_d2'] = interquartile_range(cA4_d2)
-    features['mean_absolute_power_d2'] = mean_absolute_power(cA4_d2)
-    features['rms_d2'] = rms(cA4_d2)
-    features['rmssd_d2'] = rmssd(cA4_d2)
+    features['dwt2_Approx_entropy_EN'] = temp[-1]
+    features['dwt2_Hjorth_mobility'] , features['dwt2_Hjorth_complexity'] = Hjorth_parameters(cA4_d2)
+    features['dwt2_variance'] = np.var(cA4_d2)
+    features['dwt2_population_std'] = np.std(cA4_d2)
+    features['dwt2_sample_std'] = np.std(cA4_d2,  ddof=1)
+    features['dwt2_variance'] = np.std(cA4_d2) ** 2
+    features['dwt2_mean'] = np.mean(cA4_d2)
+    features['dwt2_median'] = np.percentile(cA4_d2, 50)
+    features['dwt2_q1'] = np.percentile(cA4_d2, 25)
+    features['dwt2_q3'] = np.percentile(cA4_d2, 75)
+    features['dwt2_max'] = max(cA4_d2)
+    features['dwt2_min'] = min(cA4_d2)
+    features['dwt2_range'] = max(cA4_d2) - min(cA4_d2)
+    features['dwt2_cov'] = np.std(cA4_d2) / np.mean(cA4_d2)
+    features['dwt2_mean_abs_dev'] = np.mean(np.abs(cA4_d2 - np.mean(cA4_d2)))
+    features['dwt2_skewness'] = skew(cA4_d2)
+    features['dwt2_kurtosis'] = kurtosis(cA4_d2)
+    features['dwt2_first_derivative_std'] = first_derivative_std(cA4_d2)
+    features['dwt2_Hjorth mobility'] , features['dwt2_Hjorth complexity'] = Hjorth_parameters(cA4_d2)
+    features['dwt2_zero_crossing_rate'] = zero_crossing_rate(cA4_d2)#~~
+    features['dwt2_interquartile_range'] = interquartile_range(cA4_d2)
+    features['dwt2_mean_absolute_power'] = mean_absolute_power(cA4_d2)
+    features['dwt2_rms'] = rms(cA4_d2)
+    # features['dwt2_rmssd'] = rmssd(cA4_d2)
     
     
-    '''STATISTICAL FEATURES'''
+    '''STATISTICAL FEATURES: 1'''
     features['cov'] = np.std(segment) / np.mean(segment)
     
     
-    ''' FIDUCIAL FEATURES OR INTER-BEAT INTERVAL FEATURES'''
+    ''' FIDUCIAL FEATURES OR INTER-BEAT INTERVAL FEATURES: 10'''
     bpm = calculate_bpm(segment, sampling_rate)
     IPI = calculate_IPI(segment, sampling_rate)
     rr_intervals_sorted = np.sort(IPI)
     hist, bins = np.histogram(IPI, bins='auto', density=True)
     
     features["bpm"] = bpm
-    features["IPI"] = IPI
+    # features["IPI"] = IPI #this is an array
     features["std_IPI"] = np.std(IPI)
     features["std_diff_IPI"] = np.std(np.diff(IPI))
     features["rms_diff_IPI"] = np.sqrt(np.mean(np.diff(IPI)**2))
@@ -357,4 +355,5 @@ def statistical(segment : np.ndarray):
     features["TINN"] = rr_intervals_sorted[-1] - rr_intervals_sorted[0]
     features["triangular_index"] = np.sum(hist) / np.max(hist)
     
+    print("Done 1 more col: ")
     return features
