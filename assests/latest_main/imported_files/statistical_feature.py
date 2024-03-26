@@ -1,14 +1,14 @@
-import functools
-import time
-def time_custom(function):
-    @functools.wraps(function)
-    def time_custom_wrapper(*arg , **kwargs):
-        start = time.perf_counter()
-        function_output = function(*arg , **kwargs)
-        print(f"{function.__name__} took {time.perf_counter() - start : 0.6f} seconds" )
-        return function_output
-    
-    return time_custom_wrapper
+# # wrapper for time complexity analysis
+# import functools
+# import time
+# def time_custom(function):
+#     @functools.wraps(function)
+#     def time_custom_wrapper(*arg , **kwargs):
+#         start = time.perf_counter()
+#         function_output = function(*arg , **kwargs)
+#         print(f"{function.__name__} took {time.perf_counter() - start : 0.6f} seconds" )
+#         return function_output
+#     return time_custom_wrapper
 
 import numpy as np
 from scipy.stats import  skew, kurtosis
@@ -18,51 +18,42 @@ from scipy.fft import fft
 from ordpy import permutation_entropy
 import pywt
 from EntropyHub import  PermEn ,ApEn , SampEn, K2En, DistEn, DispEn
+import sys
+import os
+sys.path.append(os.getcwd()+'/imported_files')
+from paths_n_vars import sampling_frequency
+
+def inter_beat_variation(segment):
+    ppg = segment
+    vpg = np.gradient(ppg, axis = 0)
+    apg = np.gradient(vpg, axis = 0)
+    jpg = np.gradient(apg, axis = 0)
+
+    # identify onset points
+    onset = [x for x in range(1,len(ppg)-1) if vpg[x-1] < 0  and vpg[x] > 0 and apg[x] > 0 and jpg[x] >= 0]
+
+    # cut first 5 beats
+    beat_intervals = [onset[i] - onset[i-1] for i in range(1,len(onset))]
+    beat_intervals_variation = [beat_intervals[i] - beat_intervals[i-1] for i in range(1,len(beat_intervals))]
+    return beat_intervals_variation
 
 NAN_SUBSTITUTE = 0
 sampling_rate = 125
 
-PermEn = time_custom(PermEn)
-permutation_entropy = time_custom(permutation_entropy)
-ApEn = time_custom(ApEn)
-
 #TIME DOMAIN
 def shannon_entropy(segment):
-#     segment_sqred = segment**2
-#     return np.sum(segment_sqred * np.log2(segment_sqred))
-    p_signal = np.abs(segment) / np.sum(np.abs(segment))  # Calculate probability distribution
-    sh_entropy = -np.sum(p_signal * np.log2(p_signal))  # Calculate Shannon entropy
-    return sh_entropy
+    segment_sqred = segment**2
+    return np.sum(segment_sqred * np.log2(segment_sqred))
 
-# def symbolize(data, num_levels):
-#     min_val = np.min(data)
-#     max_val = np.max(data)
-#     step_size = (max_val - min_val) / num_levels
-    
-#     symbols = np.floor((data - min_val) / step_size).astype(int)
-#     return symbols
+# @time_custom
+def svd_entropy(data, D ,tau):
+    # partition the state space
+    data_matrix = np.array([data[i : i + len(data) - D - (tau - 2)] for i in range(D)])
 
-# def permutation_entropy(data, order, num_levels):
-#     symbols = symbolize(data, num_levels)
-#     patterns = [tuple(symbols[i:i+order]) for i in range(len(symbols) - order + 1)]
-#     _, counts = np.unique(patterns, return_counts=True, axis=0)
-#     probabilities = counts / len(patterns)
-#     entropy_val = -np.sum(probabilities * np.log2(probabilities))
-#     return entropy_val
-
-
-def svd_entropy(data):
-    # Convert pandas Series to numpy array
-    # data_array = data.values
-    data_array = data.reshape(-1, 1)
-    # print(f"svd_entropy :: data_array {data_array}")
-    # print(f"svd_entropy :: data_array shape {data_array.shape}")
-    s = np.linalg.svd(data_array ,  compute_uv = False)
-    # print(f"svd_entropy :: s {s}")
+    # calculate the singular values
+    s = np.linalg.svd(data_matrix ,  compute_uv = False)
     norm_s = s / np.sum(s)
     entropy_val = -np.sum(norm_s * np.log(norm_s))
-    # print(f"svd_entropy :: norm_s  {norm_s }\n")
-    
     return entropy_val
 
 def first_derivative_std(segment):
@@ -125,11 +116,11 @@ def boibs(segment):
 
     peaks, _ = find_peaks(np.abs(fft_result))
     amplitudes = np.abs(fft_result[peaks])
-    frequencies = np.fft.fftfreq(len(signal))[peaks]
+    frequencies = np.fft.fftfreq(len(segment))[peaks]
     return amplitudes, frequencies
 
-def fourier_kurtosis(signal):
-    fourier_transform = fft(signal)
+def fourier_kurtosis(segment):
+    fourier_transform = fft(segment)
     magnitude_spectrum = np.abs(fourier_transform)
     kurt = kurtosis(magnitude_spectrum)
     return kurt
@@ -149,6 +140,7 @@ def statistical(segment : np.ndarray):
     Ensure the argument is a numpy array
     '''
     features = {}
+    
     
     ''' TIME DOMAIN: 28'''
     # print(type(segment))
@@ -219,8 +211,16 @@ def statistical(segment : np.ndarray):
     # features['permutation_entropy_EN'] = temp[-1]
     features['permutation_entropy_EN'] = permutation_entropy(segment , dx = 5, normalized = True)
     
-    features['Shannon entropy'] = shannon_entropy(segment)
+    features['svd_entropy'] = svd_entropy(segment, D = 3, tau = 1)
     
+    features['Shannon entropy'] = shannon_entropy(segment)#~~
+    
+    # temp, _ = ApEn(segment, m = 3, tau = 1)
+    # features['Approx_entropy_EN'] = temp[-1]
+
+    # temp , _ , _ = SampEn(segment, m = 5, tau = 1)
+    # features['Sample_entropy_EN'] = temp[-1]
+
     # temp , _ = K2En(segment, m = 2, tau = 1)
     # features['Kolmogorov_entropy_EN'] = temp[-1]
 
@@ -351,6 +351,12 @@ def statistical(segment : np.ndarray):
     features["mean_cycle_duration"] = np.mean(IPI)
     features["PNN20"] = np.mean(np.abs(np.diff(IPI)) > 0.02) * 100
     features["PNN50"] = np.mean(np.abs(np.diff(IPI)) > 0.05) * 100
+    
+    ibv = [x/sampling_frequency for x in inter_beat_variation(segment)]
+    # print(f'{ibv = }')
+    features['pNN40'] = len([x for x in ibv if x > 0.04])
+    features['pNN90'] = len([x for x in ibv if x > 0.09])
+    
     features["TINN"] = rr_intervals_sorted[-1] - rr_intervals_sorted[0]
     features["triangular_index"] = np.sum(hist) / np.max(hist)
     

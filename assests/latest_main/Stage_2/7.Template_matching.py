@@ -9,6 +9,7 @@ template_fol = 'templates'
 scavenge_from = ['model_prediction/partly_corrupted','model_prediction/corrupted']
 scavenge_save_fol = 'scavenged_data'
 shift = int(0.2*125)
+correlation_cutoff = 0.9
 
 def on_press(event):
     '''
@@ -46,20 +47,21 @@ def scavenge_data(template_path , scavenging_path):
     try:
         corrupt_ppg_df = pd.read_csv(scavenging_path).drop(index = 0)
     except:
+        print(f'scavenge_data()::{(scavenging_path.split("/")[-2:])} is empty')
         return pd.DataFrame()
+    
     patient_num = re.findall(r'\d+', template_path)[0]
 
     # Assuming the template and PPG data are in 'value' column of the DataFrame, adjust as per your actual data structure
     template_data = template_df.values[:,0]
-    ppg_data = corrupt_ppg_df.values
 
     # # Visualize the template and PPG data
-    # visualize(ppg_data,template_data)
+    # visualize(corrupt_ppg_df.values,template_data)
 
     # Calculate the cross-correlation between the template and a portion of the PPG data
     # You may adjust the portion of data used here for your analysis
     window_size = len(template_data)
-    num_windows = int(corrupt_ppg_df.shape[0]/window_size)
+    num_windows = int(( corrupt_ppg_df.shape[0] -  window_size + shift ) / shift)
     print('_'*100)
     print(f'PATIENT {patient_num}:')
     print('Number of windows = ',num_windows)
@@ -75,7 +77,7 @@ def scavenge_data(template_path , scavenging_path):
             # print("Pearson's correlation coefficient: ", pcc)
 
             # Visualize the correlation result
-            if pcc > 0.86:
+            if pcc > correlation_cutoff:
                 count += 1
                 scavenged_data_df[f'{col_name}_beat{count}'] = window
 
@@ -97,12 +99,20 @@ def main_template_matching_():
     for csv in template_csv_list:
         template_csv_path = f'{template_dir}/{csv}'
         scvng_pc_csv_path = f'{scavenge_dir[0]}/{csv}'
+
+        # scavenge partly corrupted segments
         save_path = f'{scavenged_save_dir}/{csv}'
         pc_scvngd_df = scavenge_data(template_csv_path, scvng_pc_csv_path)
+
+        # scavenge corrupted segments
         scvng_c_csv_path = f'{scavenge_dir[1]}/{csv}'
         c_scvngd_df = scavenge_data(template_csv_path, scvng_c_csv_path)
+
         scvngd_df = pd.concat([pc_scvngd_df , c_scvngd_df])
-        scvngd_df.to_csv(save_path , index = False)
+        if len(scvngd_df) > 0:
+            scvngd_df.to_csv(save_path , index = False)
+        else:
+            print('Nothing Scavenged')
 
 
 if __name__ == "__main__":
@@ -114,6 +124,6 @@ if __name__ == "__main__":
 
     
     elapsed = time.perf_counter() - start
-    print(f'Time taken by {__file__} is {elapsed} seconds')
+    print(f'Time taken by {__file__.split("/")[-1]} is {elapsed} seconds')
 
 

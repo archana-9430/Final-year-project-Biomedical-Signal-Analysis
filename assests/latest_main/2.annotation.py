@@ -82,13 +82,13 @@ def annotate(local_input_folder,local_output_folder):
                     f"{local_output_folder}/{csv_file}"
                     )
             
-def _main_annotation(local_input_folder , local_output_folder):
-    # annotate(local_input_folder , local_output_folder)
+def _main_annotation():
+    annotate(input_folder , output_folder)
     merge_csv("3.annotated_data", annotated_merged)
 
 
 if __name__ == "__main__":
 
-    _main_annotation(input_folder , output_folder)
+    _main_annotation()
 
     

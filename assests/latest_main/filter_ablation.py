@@ -22,9 +22,9 @@ filter_order0 = 4
 ord_range = [1 , 8]
 lower_cutoff = f_low0
 higher_cutoff = f_high0
-filterType = 'butter'
+filterType = 'ellip'
 
-def get_good_segments(fol_path : str) -> list:
+def get_good_segments(fol_path : str , max_count: int = 3) -> list:
     csv_files = [x for x in os.listdir(fol_path) if x.split('.')[-1] == 'csv']
     
     good_list = []
@@ -36,7 +36,7 @@ def get_good_segments(fol_path : str) -> list:
         count = 0
 
         for col_name , col_series in annotated_df.items():
-            if count >= 3:
+            if count >= max_count:
                 break
             if col_series.iloc[0] == 0:
                 good_list.append((subject + '_' + col_name.split(' ')[1] , col_series.values[1:]))
@@ -80,7 +80,7 @@ def show_comparison(segment_name , segment_data):
     l, = ax.plot(bandpass_filter(segment_data, sampling_frequency, filter_order0,
                                      [f_low0 , f_high0], filterType),
                 'r',lw=2, label='Filtered')
-    ax.set_title(segment_name)
+    ax.set_title(segment_name + ' ' + filterType)
 
     ax_high_cut = fig.add_axes([0.1, 0.1, 0.65, 0.03])
     ax_low_cut = fig.add_axes([0.1, 0.15, 0.65, 0.03])
@@ -118,11 +118,70 @@ def show_comparison(segment_name , segment_data):
     button.on_clicked(reset)
     plt.show()
 
-print('script started')
-good_segmn = get_good_segments(input_fol)
-print(good_segmn)
-print(f'{len(good_segmn) = }')
-for x in good_segmn:
-    print(f'{type(x) =}')
-    print(f'{x =}')
-    show_comparison(x[0] , x[1])
+def visual_output(input_folder):
+    print('script started')
+    good_segmn = get_good_segments(input_folder)
+    print(good_segmn)
+    print(f'{len(good_segmn) = }')
+    for x in good_segmn:
+        print(f'{type(x) =}')
+        print(f'{x =}')
+        show_comparison(x[0] , x[1])
+
+#~~~~~~~~~~``
+import numpy as np
+
+def norm_data(data):
+    """
+    normalize data to have mean=0 and standard_deviation=1
+    """
+    mean_data=np.mean(data)
+    std_data=np.std(data, ddof=1)
+    #return (data-mean_data)/(std_data*np.sqrt(data.size-1))
+    return (data-mean_data)/(std_data)
+
+
+def ncc(data0, data1):
+    """
+    normalized cross-correlation coefficient between two data sets
+
+    Parameters
+    ----------
+    data0, data1 :  numpy arrays of same size
+    """
+    return (1.0/(data0.size-1)) * np.sum(norm_data(data0)*norm_data(data1))
+
+def find_max_ncc_filter(input_folder):
+    filterList = ['butter','cheby1','cheby2','ellip']
+    f_low_array = np.arange(f_low_range[0] , f_low_range[1] + 1 , 0.1)
+    f_high_array = np.arange(f_high_range[0] , f_high_range[1] + 1, 1)
+    f_order_array = np.array(range(ord_range[0] , ord_range[1] + 1))
+
+    print(f'{f_low_array = }')
+    print(f'{f_high_array = }')
+    print(f'{f_order_array = }')
+    good_segmns= get_good_segments(input_folder)
+    _segment_tuple = good_segmns[0]
+    print(f'Patient: {_segment_tuple[0]}') 
+    max_cross_corell = 0
+    best_filter_spec = ()
+    for _ftype in filterList:
+        for _order in f_order_array:
+            for _f_low in f_low_array:
+                for _f_high in f_high_array:
+                    _segment_data = _segment_tuple[1]
+                    _filtered_data = bandpass_filter(_segment_data , sampling_frequency , _order , [_f_low , _f_high] , _ftype)
+                    cross_corell = ncc(_segment_data , _filtered_data)
+                    if cross_corell > max_cross_corell:
+                        best_filter_spec = ( _order , [_f_low , _f_high] , _ftype)
+                        max_cross_corell = cross_corell
+        
+    print(f'Best filter specs : {best_filter_spec}')
+    print(f'Max obtained ncc : {max_cross_corell}')
+             
+visual_output(input_fol)
+print('Aaein?')
+find_max_ncc_filter(input_fol)
+
+# if __name__ == 'main':
+#     _main()
