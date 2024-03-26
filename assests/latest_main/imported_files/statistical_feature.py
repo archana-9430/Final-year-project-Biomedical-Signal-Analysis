@@ -244,7 +244,6 @@ def statistical(segment : np.ndarray):
     features['dwt_variance'] = np.var(cA4)
     features['dwt_population_std'] = np.std(cA4)
     features['dwt_sample_std'] = np.std(cA4,  ddof=1)
-    features['dwt_variance'] = np.std(cA4) ** 2
     features['dwt_mean'] = np.mean(cA4)
     features['dwt_median'] = np.percentile(cA4, 50)
     features['dwt_q1'] = np.percentile(cA4, 25)
