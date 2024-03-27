@@ -1,4 +1,4 @@
-from imported_files.paths_n_vars import feature_merged
+from imported_files.paths_n_vars import stats_features
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ from sklearn.pipeline import Pipeline
 
 from collections import Counter
 
-features = pd.read_csv(feature_merged)
+features = pd.read_csv(stats_features)
 labels = features['annotation'] # this will exract the annotation 2nd row
 
 rand_state = 54
@@ -43,12 +43,10 @@ print(f"Total instances : {dict(Counter(labels))}")
 print(f"Train instances : {num_instances_train}")
 print(f"Test instances : {num_instances_test}")
 
-
-
 # create pipeline
 print('_'*50)
-rfe = RFE(estimator = RandomForestClassifier(), n_features_to_select = 100)
-model = RandomForestClassifier( n_estimators = 30 , max_depth= 10, criterion = 'gini' , verbose = 1, n_jobs=-1)
+rfe = RFE(estimator = RandomForestClassifier(), n_features_to_select = 120)
+model = RandomForestClassifier( n_estimators = 200 , max_depth= 10, criterion = 'gini' , verbose = 1, n_jobs=-1)
 pipeline = Pipeline(steps=[('feature_selection',rfe),('model',model)] , verbose=True)
 print("pipeline created")
 

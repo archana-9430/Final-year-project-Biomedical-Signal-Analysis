@@ -5,13 +5,15 @@ from sklearn.model_selection import GridSearchCV
 
 rand_state = 54
 test_fraction = 0.5
-num_trees = 50
+num_trees = 400
 split_criteria = "gini"
+max_depth = 10
 
 # k of k fold cross validation
 k = 9 # change if you want to experiment
 # class list
 # class_list = ["0" , "1"] # good segn = 0 , corrupted signal = 1
+
 
 # ~~~~~~~LIBRARIES~~~~~~~
 import pandas as pd
@@ -89,7 +91,7 @@ def rf_model_function( local_features_file , description : str = ""):
     assert not ('annotation' in x_train.columns or 'PatientID' in x_train.columns)
     # create and train classifier
     rf_model = Ml_helper('rf' , n_estimators = num_trees , random_state = rand_state \
-                                  , criterion = split_criteria, n_jobs = -1)
+                                  , max_depth = max_depth, criterion = split_criteria, n_jobs = -1)
     
     # # hyper parameter tuning
     # print('Hyper parameter tuning starts')    
@@ -120,10 +122,10 @@ def rf_model_function( local_features_file , description : str = ""):
 print("~"*25 + " RF:: W/O AE FEATURES " + "~"*25)
 list_stats , stat_miss_class = rf_model_function(stats_features, description = "Statistical features")
 
-print("~"*25 + " RF:: ONLY AE FEATURES " + "~"*25)
-list_ae , ae_miss_class = rf_model_function(AE_features, description = "AE features")
+# print("~"*25 + " RF:: ONLY AE FEATURES " + "~"*25)
+# list_ae , ae_miss_class = rf_model_function(AE_features, description = "AE features")
 
-print("~"*25 + " RF:: WITH ALL FEATURES " + "~"*25)
-list_all , all_miss_class = rf_model_function(feature_merged, description = "All features")
+# print("~"*25 + " RF:: WITH ALL FEATURES " + "~"*25)
+# list_all , all_miss_class = rf_model_function(feature_merged, description = "All features")
 
 
